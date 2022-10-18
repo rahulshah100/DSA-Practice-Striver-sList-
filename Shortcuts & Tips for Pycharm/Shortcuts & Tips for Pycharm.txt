@@ -1,0 +1,22 @@
+Shortcuts:
+ctrl+alt+L: AutoFormat Code
+
+alt+click: Multi-cursor functionality
+
+with the focus/cursor in the content of the file, right click and select open in explorer: Open that File/Folder in the Windows explorer's file-directory structure
+
+Files->Settings->Editor->General: WordWrap On, and Cursor Zoom Enabling in Pycharm
+
+ctrl+arrow keys: move page up and down without having to move cursor position
+
+alt+left/right arrow keys-> to change between opened up tabs/pages in the order they are shown opened
+
+shift+f10: run python program
+
+ctrl+E: split screen in pycharm
+
+ctrl+f:to Find all occurences of a given character or set of characters on that program
+ctrl+r:to Replace all occurences of a given character or set of characters on that program
+
+Tips:
+To remove unnecessary underlines in the py files, due to suggested improvements or typos, hover on green tick symbol on the righter hand upper corner and select only Syntax. Attached image for reference: In this same directory go to Images for reference and check 1.png

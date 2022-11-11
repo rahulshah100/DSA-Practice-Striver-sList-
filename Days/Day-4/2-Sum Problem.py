@@ -34,7 +34,7 @@ class Solution:
     def twoSum(self, nums: List[int], target: int) -> List[int]:
         hashtable={}
         for i in range(len(nums)):
-            if hashtable.get(target-nums[i])!=None:
+            if hashtable.get(target-nums[i])!=None: #Note: this line could also be written as "if target-nums[i] in hashtable:" and in both ways, it'' take only a O(1) time in python
                 return (hashtable[target-nums[i]], i)
             else:
                 hashtable[nums[i]]=i

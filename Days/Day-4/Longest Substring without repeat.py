@@ -69,7 +69,7 @@ class Solution:
 # SC:O(n) Explanation: An extra arr variable.
 
 
-# Approach3: Improved time complexity, compromised space complexity than Approach2, by replacing the array with a dictionary. Where in approach 2 we had to move left all the way till way find an item which is pointed by right, if we can store the indexes of occurence of items, and directly place left at an index after where the occurence of the item is shown, then that will save from left pointer's motion.
+# Approach3: Improved time complexity, compromised space complexity than Approach2, by replacing the array with a dictionary. Where in approach 2 we had to move left all the way till way find an item which is pointed by right, if we can store the indexes of occurence of items, and directly place left at an index after where the occurence of the item is shown, then that will save the left pointer's motion.
 class Solution:
     def lengthOfLongestSubstring(self, s: str) -> int:
         left,right=0,0

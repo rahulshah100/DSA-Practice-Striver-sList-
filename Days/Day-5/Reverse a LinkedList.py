@@ -20,7 +20,7 @@
 # -5000 <= Node.val <= 5000
 # ------------------------------------------------------------------------------------------------------------------------
 
-# NOTE: Although in above examples we see the given input:head as a list, but in reality the input we're getting is a linked list, to prepare which we'll have to have to custom make them as Objects. We would have to implement an insert method to push nodes one after the other in class ListNode and thus prepare an input to pass it as head. To get better understanding of this checkout ProblemsOutsideOfStriverList/LinkedListBasicOperations. Hence, here I have not considered putting down entire solution which couold be ran; but in leetcode, on this question's link, we can paste this code in solution and would have to run it.
+# NOTE: Although in above examples we see the given input:head as a list, but in reality the input we're getting is a linked list, to prepare which we'll have to have to custom make them as Objects. We would have to implement an insert method to push nodes one after the other in class ListNode and thus prepare an input to pass it as head. To get better understanding of this checkout ProblemsOrLearnings_OutsideOfStriverList/LinkedListBasicOperations. Hence, here I have not considered putting down entire solution which couold be ran; but in leetcode, on this question's link, we can paste this code in solution and would have to run it.
 
 # Basics of linked list: It is an object, which has n items/nodes/object with each item pointing to it's consequtive other/others depending on singly/doubly or cirular linked list. In singly linked list, at the front, we'll have a head pointer pointing to the first node, and next of the last node in that linked list pointing to None.
 

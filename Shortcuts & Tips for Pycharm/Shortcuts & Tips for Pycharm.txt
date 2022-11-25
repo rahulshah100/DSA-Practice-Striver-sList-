@@ -18,5 +18,7 @@ ctrl+E: split screen in pycharm
 ctrl+f:to Find all occurences of a given character or set of characters on that program
 ctrl+r:to Replace all occurences of a given character or set of characters on that program
 
+ctrl+shift+f: to search amongst all the files in the root directory opened up in pycharm
+
 Tips:
 To remove unnecessary underlines in the py files, due to suggested improvements or typos, hover on green tick symbol on the righter hand upper corner and select only Syntax. Attached image for reference: In this same directory go to Images for reference and check 1.png

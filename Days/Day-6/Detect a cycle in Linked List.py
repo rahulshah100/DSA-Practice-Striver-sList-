@@ -50,7 +50,7 @@ class Solution:
 class Solution:
     def hasCycle(self, head: Optional[ListNode]) -> bool:
         fast = slow = head         #these are all pointing to where the head is stored, as equals-to/assignment in python means reference by value. Also further when we do fast.next, it is fast which is going in next of where it was pointing, and as such it is not changing what is stored at the location where head is pointing, the fast.next will not impact slow's or head's values or anything.
-        while fast and fast.next: #if we an empty or only one item list we were getting error's of fast.next.next undefined, so we overcame it like this.
+        while fast and fast.next: #if we have an empty or only one item list we were getting errors of fast.next.next undefined, so we overcame it like this.
             fast = fast.next.next
             slow = slow.next
             if slow == fast:

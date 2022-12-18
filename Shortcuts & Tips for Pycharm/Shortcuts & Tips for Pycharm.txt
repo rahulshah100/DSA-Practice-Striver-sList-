@@ -5,6 +5,9 @@ alt+click: Multi-cursor functionality
 
 with the focus/cursor in the content of the file, right click and select open in explorer: Open that File/Folder in the Windows explorer's file-directory structure
 
+ctrl+z->undo
+ctr+shift+z->redo
+
 Files->Settings->Editor->General: WordWrap On, and Cursor Zoom Enabling in Pycharm
 
 ctrl+arrow keys: move page up and down without having to move cursor position

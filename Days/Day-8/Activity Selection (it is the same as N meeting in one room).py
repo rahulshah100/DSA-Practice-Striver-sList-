@@ -1,0 +1,2 @@
+# It is just exactly same as N meeting in one room
+# The reason why in this one and N meeting in one room question we cant employ same technique as we have in Minimum number of platforms required is because in count platform question when sorting of arrays changed the order of arrival and departure, it didn't any difference in decrementing ct var as a the current arrival is before the previous one's departure. As in for that question as far as there was any arrival after prev departure it didnt really matter what exactly was arrival. But in this question we `

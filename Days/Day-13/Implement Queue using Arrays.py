@@ -128,6 +128,8 @@ myQueue.put(9)
 print('Popped Item', myQueue.get()) #Popped Item 1
 
 print('Is Queue empty?:', myQueue.empty()) #Is Queue empty?: False
+
+print('Size of Queue', len(myQueue.queue)) #Size of Queue 2
 print("Size of Queue", myQueue.qsize()) #Size of Queue 2
 
 # Print the top
@@ -137,3 +139,4 @@ print("Top of Queue",myQueue.queue[0]) #Top of Queue 12
 print("\nAll items in Queue:")      #All items in Queue:
 for i in range(myQueue.qsize()):    #12
     print(myQueue.queue[i])         #9
+print(myQueue.queue) #deque(['12', 9])

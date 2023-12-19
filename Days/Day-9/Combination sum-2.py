@@ -14,61 +14,54 @@
 # 1 <= candidates.length <= 100
 # 1 <= candidates[i] <= 50
 # 1 <= target <= 30
-# ----------------------------------------------------------------------------------------------------------------------
-# Approach1: Here, while using pick and non-pick approach as it is specified that same number from array cant be repeated within same subArray, we'll always increment the current index. So function params of recursive function will be index, sum, subArray. Out of which index always increments while sum and subArray increment by given array's current index item, in case of pick and stays as it is in not pick case. Also unlike Combination sum-1, here constraint doesnt say there will be all distinct items in given Array. So we stick to using a resSet instead of resArr and also sort the given Array to avoid duplicate subArrays. Base condition is to return out of the function in case index is equal to length of array or sum exceeds the target. Contrarily if sum is found equal to target, we append subArray into resSet and then return out of the function. One thing to note is unlike in Combination sum-1, here order of base conditions matters and in fact here #--1 has to be mentioned compulsorily before #--2. This is for case where target=7 and givenArr=[1,2,7] where for non-pick call when subArr=[7] and index=2, and further a call to index+1 i.e. 3 index is made if #--2 is met first then without appending the subArr where sum=7, we'll terminate the function. In Combination sum-1 as there was a keep picking call, it took care of creating a subArr=[7] while not incrementing the index to 3.
-"""
+# --------------------------------------------------------------------------------------------------------------------------------
+# Approach1: Using Combination sum-1.py's pick and non pick method with 3 changes we achieve this. First when picking unlike Combination sum-1.py here we can't chose the same number for more than one so we shrink candidates to items excluding the last one with each recursive call. Further at the start we sort the candidates so that for arr=[12,1,43,5,1,32] we wont get sub-arrays as [1,5] and [5,1] which will be considered seperate, but now we'll have both as [1,5]. Finally to exclude repeating subArrays, while appending we check if temp is not in ansArr.
+"""from typing import List
+
 class Solution:
     def combinationSum2(self, candidates: List[int], target: int) -> List[List[int]]:
         candidates.sort()
-        resSet = set()
+        return self.helperFunc([], [], 0, candidates, target)
 
-        def helperFunc(index, sum, subArr):
-            if sum == target:                    #--1
-                resSet.add(tuple(subArr))
-                return
-            elif index == len(candidates) or sum > target: #--2
-                return
-            # keeps picking current
-            temp = subArr[:]
-            temp.append(candidates[index])
-            helperFunc(index+1, sum + candidates[index], temp)
-            # not-pick current
-            helperFunc(index + 1, sum, subArr)
-
-        helperFunc(0, 0, [])
-        return resSet
+    def helperFunc(self, temp, ansArr, sum, candidates, target):
+        if sum<target and len(candidates)!=0:
+            self.helperFunc(temp, ansArr, sum, candidates[:-1], target)
+            temp.append(candidates[-1])
+            self.helperFunc(temp, ansArr, sum+candidates[-1], candidates[:-1], target)
+            temp.pop()
+        elif sum==target and temp not in ansArr:
+            ansArr.append(temp[:])
+        return ansArr
 
 S = Solution()
-print(S.combinationSum2([2,5,2,1,2], 5))
+print(S.combinationSum([2, 3, 6, 7], 7))
 """
-# TC: O(n(2^n)+nlogn) Explanation: temp creation takes n time, for 2^n recursive calls. Along with sorting the given array at begining for once.
+# TC: O(nlogn + 2^n + 2^2n) Explanation: Sorting the given array at begining for once takes nlogn. Each call grows with 2 more, so 2^n time complexity for all recursive calls. Plus at the end for 2^n cases at worst i.e. all pick and non-pick combination we will have to check through ansArr of size 2^n if temp is not in ansArr.
 # SC: O(2n) Explanation: Recursive stack space- n. temp contributing n more space in addition to recursive stack space.
 
 
-# Approach2: Improved SC and marginal improvement in TC. We'll avoid using set() by incorporating the method of using a for loop with a condition to create all possible subArrays of the same length yet avoiding duplicates. This will save us of from list into tuple so to store it into set(). Also when a new item is stored in set() it runs a duplicate/collision detection check which under the hood makes using set() more expensive than lists in terms of time. So, inside a for loop, we'll append the current index's item from given array into subArray param and further recursively call the same function on updated subArr and updated index-params so that on top of them subArrays of further length could be generated. For base condition as last sublength would already have it's index at n-1, it wont enter into for loop and thus function ends by default with a return None.
+# Approach2: In approach1 we'll avoid checking the condition of temp not in ansArr by devising a similar logic to Subset-ii.py, where in we create all possible subarrays of one length at a time in a for-loop and put recursive call for each for-loop iteration with an incremented index so that on top of existing length of array, more elements can be added and a bigger array could be built. In this for-loop we use continue-statement to skip iterations where when i!=index and still if the item at i in candidates is same as candidate's i-1th item. In each recursive function call we check first if sum is equal to target and if so, we append a copy of temp into ansArr. If otherwise sum>target or index==len(candidates) we return back from that function. Also note we use sorted candidates array here.
 from typing import List
-
 
 class Solution:
     def combinationSum2(self, candidates: List[int], target: int) -> List[List[int]]:
         candidates.sort()
-        resArr = []
+        return self.helperFunc([], [], 0, 0, candidates, target)
 
-        def helperFunc(index, sum, subArr):
-            if sum == target:
-                resArr.append(subArr)
-            elif sum > target: #To avoid keep checking for all the numbers even further ahead uptill last elem if we already have exceeded sum
-                return
-
-            for i in range(index, len(candidates)):
-                if i != index and candidates[i] == candidates[i - 1]: continue
-                helperFunc(i + 1, sum + candidates[i], subArr + [candidates[i]]) #Difference between concate and append for an array is that concate doesnt change original array but rather returns a new array that has copied all items from old array and at end adds the appended item. That also explains second difference which is that while append takes O(1) TC concate takes O(n) TC. So ovreall subArr + [candidates[i]] takes same time as temp=subArr[:]; temp.append(candidates[i])
-
-        helperFunc(0, 0, [])
-        return resArr
-
+    def helperFunc(self, temp, ansArr, sum, index, candidates, target):
+        if sum==target:
+            ansArr.append(temp[:])
+        elif sum>target or index==len(candidates):
+            return
+        for i in range(index, len(candidates)):
+            if i != index and candidates[i] == candidates[i - 1]:
+                continue
+            temp.append(candidates[i])
+            self.helperFunc(temp, ansArr, sum+candidates[i], i+1, candidates, target)
+            temp.pop()
+        return ansArr
 
 S = Solution()
-print(S.combinationSum2([2, 5, 2, 1, 2], 5))
-# TC:O(nlogn + n(2^n)) Explanation: sorting array at the starting- n and later generating all the arrays of same length and increasing the length then for generating all possible subArrays which are 2^n inside which every time at worst n TC would be taken for concate operation- hence n(2^n) TC.
-# SC:O(n) Explanation: We're not creating a temp, so only for recursive calls stack space of n will be occupied.
+print(S.combinationSum2([2, 3, 6, 7], 7))
+# TC:O(nlogn + 2^n) Explanation: sorting array at the starting takes nlogn and later exploring the cases of all the subarrays possible i.e. 2^n
+# SC:O(n) Explanation: Only for recursive calls stack space of n will be occupied.

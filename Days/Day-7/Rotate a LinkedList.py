@@ -24,19 +24,20 @@
 #         self.next = next
 class Solution:
     def rotateRight(self, head: Optional[ListNode], k: int) -> Optional[ListNode]:
-        if head == None or head.next == None:
+        if not head or not head.next:  # In case array is empty or has only 1 elem, return as is
             return head
 
-        end = head
+        nextNode = head
         while k:
-            head = end # as end points to head after each reversal, the head must be shifted to the new starting of linked list.
-            while end.next:
-                secondlast = end #Also remember variable scope is it's function and not the loop. Hence secondlast could be accessed at #--1
-                end = end.next
-            end.next = head
-            secondlast.next = None #--1
             k -= 1
-        return end
+            curr = nextNode
+            while curr.next:
+                prev = curr
+                curr = curr.next
+            prev.next = None
+            curr.next = nextNode
+            nextNode = curr
+        return nextNode
 # TC: O(kn) Explanation: for making a reversal, every time we'll stretch through entire list length i.e. n. So to make k reversals in n sized list TC will be O(kn)
 # SC: O(1)
 
@@ -48,20 +49,37 @@ class Solution:
 #         self.next = next
 class Solution:
     def rotateRight(self, head: Optional[ListNode], k: int) -> Optional[ListNode]:
-        if head==None or head.next==None or k==0:
+        # Handling Exception
+        if not head or not head.next:
             return head
-        temp, count=head, 0
+
+        # Counting total Nodes
+        ct, temp = 0, head
         while temp:
-            count+=1
-            temp=temp.next
-        temp.next=head #Last item points to head
-        k=k%count      #reducing k to k%n
-        lastNode=0
-        while lastNode<count-k-1:
-            head=head.next
-            lastNode+=1
-        temp=head.next #registering the starting of reversed list
-        head.next=None #pointing n-kth item to None
-        return temp
-# TC: O(n) Explanation: n Time for counting total length of given linked list. Later, we'll just traverse for once to go till n-kth item. Hence in total n+n-k time is taken which is generalised as n.
+            ct += 1
+            temp = temp.next
+
+        # Modify given k
+        k %= ct
+        if k == 0:  # This is important where no reversal has to be done or say, coz say head=[1,2] and k=0 then after below for-loop, curr'd be at 2. Further when curr=nextNode, curr becomes None and later `while curr.next` gives error, as None has no next property
+            return head
+
+        # Get to point which is to be last Node
+        curr = head
+        for i in range(ct - k - 1):
+            prev = curr
+            curr = curr.next
+
+        # Point the next of to be Last Node to None
+        nextNode = curr.next
+        curr.next = None
+        curr = nextNode
+
+        # In the rest of portion after to be last node, go to very Last Node and make it point to starting of LL
+        while curr.next:
+            curr = curr.next
+        curr.next = head
+
+        return nextNode
+# TC: O(2n) Explanation: n Time for counting total length of given linked list. Later, we'll just traverse to go till n-kth item, and after that we go to last node after n-kth and thus we collectively traversed n nodes again. Hence in total n+n time is taken which is generalised as n.
 # SC: O(1)

@@ -22,27 +22,58 @@
 
 # Note: Time intervals are in the 24-hour format(HHMM) , where the first two characters represent hour (between 00 to 23 ) and the last two characters represent minutes (this may be > 59).
 
-# Expected Time Complexity: O(nLogn)
+# Expected Time Complexity: O(nlogn)
 # Expected Auxiliary Space: O(n)
 
 # Constraints:
 # 1 ≤ n ≤ 50000
 # 0000 ≤ A[i] ≤ D[i] ≤ 2359
-# ---------------------------------------------------------------------------------------------------------
-# Approach1: In constraints the departure is mentioned to possibly be equal or later, but never before corresponding arrival. We'll sort departure and arrival time and will traverse through arrival times. We'll use an l variable to mark the last departure which we'll keep comparing while traversing the sorted arrival times. If departure pointed by l is before/lesser than current iteration's arrival then that will mean that platform has become vacant, in which case from an initially declared ct variable which is used to keep count of platforms-required-at-any-time the value will be decremented by 1. Further we'll continue comparing the further departures with same arrival time by incrementing l pointer by 1, uptill l is lesser than or equal to the index of current arrival time and uptill updated departures are also before the current arrival. Contradictingly if arrival time is before/lesser than departure pointed by l, it also has to be before the later departures as departure array is sorted and hence we'll increment ct by 1 indicating requirement of 1 more platform. In each iteration of arrival time we'll increment ct by 1 and compare the updated ct with a maxCt variable which keeps a track of max ct found. At the end maxCt will be returned.
+# -----------------------------------------------------------------------------------------------------------------------------------------
+# Approach1: Sorting the arr, and corresponding entries of dep would follow. For this I am merging both arrays into multiple sub-arrays each with a pair of arr, dep time and storing whole thing into a new arr. The new arr is sorted based on key as first value of its items. Further I split back sorted sub-arrays into arr and dep arrays. After this we run a nested for loop to check for each entry if there are any prev entries which have their departure after or at time of current one's arrival which if so we keep a local counter and increment it by 1. To keep track of max local, we use a globCt which is returned at the end.
+"""class Solution:
+    def minimumPlatform(self, n, arr, dep):
+        globCt = 1
+        mixedDict=[]
+        for i in range(n):
+            mixedDict.append([arr[i],dep[i]])
+        mixedDict.sort(key=lambda x: x[0])
+
+        for i in range(n):
+            arr[i],dep[i]=mixedDict[i][0],mixedDict[i][1]
+
+        for i in range(n):
+            locCt = 1
+            for j in range(i):
+                if arr[i] <= dep[j]:
+                    locCt += 1
+            globCt = max(globCt, locCt)
+        return globCt
+
+S = Solution()
+print(S.minimumPlatform(10,[41,1616,297,2042,1013,987,2050,525,636,109], [2275,2076,1580,2144,1231,1672,2137,1016,2234,1043]))"""
+# TC: O(2n + nlogn + n^2) Explanation: Total Tc is n + n + nlogn + n(1 + 2 +...n-1) i.e. 2n + n(n+1)/2 => giving worst TC as n^2
+# SC: O(2n) Explanation: For using mixedDict to store n extra items each of which is 2 integers.
+
+
+# Approach2: In constraints the departure is mentioned to possibly be equal or later, but never before corresponding arrival. We'll sort departure and arrival time seperately and will traverse through arrival times. After that we'll traverse both arrays using 'a' and 'd' pointer respectively, before either of the pointers run out on the entire length of it's corresponding array. In each iteration we'll compare dep of 'd' index to be equal to or greater than arr at 'a' index. If true, it means the train at d index has not departed as train at 'a' index arrived. So we'll increase a counter and check for next arr time by incrementing 'a' pointer. Conversely, in else-statement we'll free a platform by decrementing the counter, alongside increment 'd' pointer. To keep track of max value counter reaches, we'll use a globalCounter.
 class Solution:
     def minimumPlatform(self, n, arr, dep):
         arr.sort()
         dep.sort()
-        l = ct = maxCt = 0
-        for i in range(n):
-            while arr[i] > dep[l] and l<=i: #in question it is specified if at same time a train has departed if an another comes, we have to provide seperate platform. Or here we would've used 'arr[i] >= arr[l]'. Also as by constraint: arrival and departure could be the same so we have to seek l uptill same value as i.
+
+        a, d = 0, 0
+        ct = maxCt = 0
+        while a < n and d < n:
+            if dep[d] >= arr[a]:
+                ct += 1
+                a += 1
+                maxCt = max(maxCt, ct)
+            else:
                 ct -= 1
-                l += 1
-            ct += 1
-            maxCt = max(maxCt, ct)
+                d += 1
         return maxCt
 S=Solution()
-print(S.minimumPlatform(6,[1, 3, 0, 5, 8, 5],[2, 4, 6, 7, 9, 9]))
-# TC: O(n+m) given arr and dep are of size n and m respectively.
+# print(S.minimumPlatform(6,[1, 3, 0, 5, 8, 5],[2, 4, 6, 7, 9, 9]))
+print(S.minimumPlatform(4,[900, 915, 945, 1015], [930,1000,1030,1045]))
+# TC: O(2nlogn + 2n) Explanation: 2n is what while loop will take in worst case where 'd' is traversed full lenght and so is 'a', and 2nlogn is to sort the two arrays.
 # SC: O(1)

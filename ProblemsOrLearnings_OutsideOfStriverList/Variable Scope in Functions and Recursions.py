@@ -1,6 +1,6 @@
 from typing import List
 
-ANum = [12, 23]
+ANum = [12, 23]     #--1
 class Solution:
     def AnyRandomFunc(self, nums: List[int]) -> int:
         def recursiveFunction():
@@ -18,7 +18,7 @@ class Solution:
 def AnyRandomFunc2():
     ANum[0] = ANum[0] + 1
 
-def AnyRandomFunc3(ANumIsSent): #If mutable datatypes i.e.lists,dicts, and set are passed into a function, then altering them from within the function will alter their original variables too. That is because they're always passed by reference and not by value. That is the reference of mem address where the original one is stored is passed as opposed to passing the value of variable. We can use is operator to verify this. As is below: 'is' shows True. So unlike == which compares value, 'is' operator compares id(var1)==id(var2) i.e. mem locatn.
+def AnyRandomFunc3(ANumIsSent): #If mutable datatypes i.e.lists,dicts, and set are passed into a function, then altering them from within the function will alter their original variables too. That is because they're always passed by reference and not by value. That is the reference of mem address where the original one is stored is passed as opposed to passing the value of variable. We can use is operator to verify this. As seen below: 'is' shows True. So unlike == which compares value, 'is' operator compares id(var1)==id(var2) i.e. mem locatn.
     print('ANumIsSent is ANum-',ANumIsSent is ANum)
     ANumIsSent[0] = ANumIsSent[0] + 1
 
@@ -38,7 +38,7 @@ def AnyRandomFunc5(ANum):
 #     ANum[0]+=1
 
 def AnyRandomFunc6(A):
-    global ANum  # Makes this the Global Variable
+    global ANum  # Makes this the Global Variable defined outside at #--1
     ANum = [112, 12]
     ANum[0] += 1
 
@@ -70,3 +70,5 @@ print()
 print('ANum Before AnyRandomFunc6', ANum)
 AnyRandomFunc6(ANum)
 print('ANum After AnyRandomFunc6', ANum,end="\n")
+
+# TakAway: While passing derived DataStructure (especially in recusrsion) pass a copy and not the original list. In merge sort code we can see arr[:mid] and arr[mid:] passes not arr but a seperately created array including specified entries.

@@ -14,7 +14,7 @@
 # The number of nodes in the list is in the range[1, 105]. 
 # 0 <= Node.val <= 9
 # ----------------------------------------------------------------------------------------------------------------------------------
-# Approach 1: 2 Pointers Method=> As in singly linked list reverse front & back both traversal is not possible by default, so to keep comparing the front and back items we make the given linked list into an array and use a starting and ending pointers to compare items.
+# Approach 1: 2 Pointers Method=> As in singly linked list front & back both traversal is not possible by default, so to keep comparing the front and back items we make the given linked list into an array and use a starting and ending pointers to compare items.
 # Definition for singly-linked list.
 # class ListNode:
 #     def __init__(self, val=0, next=None):
@@ -27,17 +27,18 @@ class Solution:
             arr.append(head.val)
             head = head.next
 
-        l, u = 0, len(arr) - 1
-        while l < u:
-            if arr[l] != arr[u]:
+        for i in range(len(arr)):
+            if arr[i] != arr[len(arr) - i - 1]:
                 return False
-            l += 1
-            u -= 1
+
         return True
 # TC: O(n) Explanation: n time to save n items in an array, and addition n/2 time to traverse the array using two pointers i & j. Total TC is n + n/2, so we can mention it as linear TC.
 # SC: O(n) Explanation: to store n items in an array.
 
-# Approach 2: We will use a fast and a slow pointer which will move by one and two nodes respectively, to find the middle node of given linked list. Starting from the head, as soon as fast->next or fast->next->next (in case of odd and in case of even number of nodes respectively) points to None, the slow pointer would be pointing at the middle node. From slow->next to the remaining part of linked list we will reverse it. Now, we will use a pointer from the starting of linked list and move slow to slow->next, so to further on compare node values pointed by both of these pointers. If till slow reaches None and items have matched, then we have a palindrom for a linked list.
+# Approach 2: Using turtle hayer method i.e. fast and slow pointer, we'll get slow pointer to either middle node or n//2+1th node in case of odd or even number of nodes respectively. Now say in [1,2,3,2,1] slow is at 3; starting from slow we'll reverse the rest of the list so we'll have 1->2->3<--------             #Side example for even nums: [17, 23, 23, 17]       17->23->23<---------
+#      None<------|        |                                                                          |         |
+#                          |<--2<--1                                                                  -->None   17
+# This reversal is done using 3 pointer method curr,next and prev. So at the end of reversal we'll have prev at last being right most 1, which goes to 2 and then 3 and then None. Such is the flow of head starting from left most 1. Taking benefit of this, we run a while loop where we compare head and prev's values. If they don't match before prev becomes None in while-loop we return False or else True.
 class Solution:
     def isPalindrome(self, head: Optional[ListNode]) -> bool:
         fast = slow = head
@@ -46,11 +47,11 @@ class Solution:
             fast = fast.next.next
 
         curr = slow
-        prev = None #If here we did prev = slow, then as both curr and prev will start pointing the same linked list, after #--1 the prev would still point to prev.next which due to #--1 will start pointing prev and list will become a cycle and hence undending.
+        prev = None
         nextNode=None
         while curr:
             nextNode = curr.next
-            curr.next = prev #--1
+            curr.next = prev
             prev = curr
             curr = nextNode
 

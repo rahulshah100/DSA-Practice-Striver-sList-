@@ -26,11 +26,6 @@
 #         self.next = next
 class Solution:
     def mergeTwoLists(self, list1: Optional[ListNode], list2: Optional[ListNode]) -> Optional[ListNode]:
-        if list1==None: #This does take care, also of the case where list1=[]. So [] is how input is shown but in reality this doesnt show an empty array but it is just a way to represent input, as we're given in question we're given linked lists so what list1=[] really means is there are no Node Objects list1 is pointing to, implying it is pointed to None. So empty arr==None=> false but empty LL/LLpointer==None=>True
-            return list2
-        elif list2==None:
-            return list1
-
         head=dummyNode=ListNode(0)
 
         while list1 and list2:
@@ -57,7 +52,23 @@ class Solution:
 # SC: O(m+n) Explanation: Those many extra newNodes are made
 
 
-# Approach2: Like Approach1 we'll create a placeholder Node with arbitary value pointed by 2 pointers. Now, unlike approach1 instead of creating newNode at each iteration, one pointer amongst the two pointing to placeholder node would make the next of placeholder node point to smaller value amongst list1 and list2. Later to accordingly increment list1 or list2's alongside incrementing pointer pointing to placeholder to now it's next. This will go on till list1 or list2 is None. Later we'll check if list1 is not empty will just append the whole of the remaining list at once or vice versa with list2. Finally returning the next of the other pointer pointing to placeholder Node.
+# Approach2: Approach1 but more presentable:
+"""class Solution:
+    def mergeTwoLists(self, list1: Optional[ListNode], list2: Optional[ListNode]) -> Optional[ListNode]:
+        temp=dummy=ListNode(0)
+        while list1 or list2:
+            if not list2 or (list1 and list1.val<=list2.val):
+                temp.next=ListNode(list1.val)
+                list1=list1.next
+            else:
+                temp.next=ListNode(list2.val)
+                list2=list2.next
+            temp=temp.next
+        return dummy.next"""
+# Time and Space complexities same as above
+
+
+# Approach3: Improvement in approach1 (could be done similarly with approach2) dont use new nodes for all the nodes of LL1 and LL2 but instead just create a starting Node pointed by dummy and temp such two variables, and it's next will directly point on to LL1 or LL2. Respectively the corresponding pointer will be increased.Like and so would the temp. Same process repeats and as we run out of loop, we then join rest of whichever amongst LL1 and LL2 is left.
 # Definition for singly-linked list.
 # class ListNode:
 #     def __init__(self, val=0, next=None):
@@ -85,7 +96,7 @@ class Solution:
 # SC: O(1) Explanation: only a constant space utilizing ListNode object for val 0 has been created
 
 
-# Approach3: More efficient space handling than approach2, using an in-place algorithm. Idea: with aid of an extra pointer- prev, while iterating through lists we'll keep comparing between nodes of both lists and keep making sure list1's node val is always smaller than list2's; we'll use prev to wove/interlace both the lists into 1 by following the  movement of list1 pointer. So we'll use a while loop to increment list1 till it's over. In any iteration, if list1's val is found bigger than list2's we'll swap list1 and list2. With this flipping of list1, our prev pointer will help to conjoin the current list with updates values of list1.
+# Approach4: More efficient space handling than approach2, by even avoiding creation of one extra dummy/head node. Along with given heads of two different LL we'll use 2 extra variable here: one for keeping note of new head of the combined LL and second to help us combine. So we'll iterate through arrays making sure that list 1 is having smaller value than list 2. If so we'll simply traverse list 1 to it's next node. If turns out LL 1 is greater, we swap List1 with List at that point and here's where 2nd extra pointer we created comes handy. Second pointer will keep following list1 in every step hence here after swap secondExtraPointer is at the point in former list1 till where it was shorted in ascending order. Now with list1 swapped we make secondExtraPointer's next as list1 just like we had it keep following. Now list1 is bound to run out on first than list2 and as that happens we just change temp's next to list 2
 # Definition for singly-linked list.
 # class ListNode:
 #     def __init__(self, val=0, next=None):
@@ -93,27 +104,26 @@ class Solution:
 #         self.next = next
 class Solution:
     def mergeTwoLists(self, list1: Optional[ListNode], list2: Optional[ListNode]) -> Optional[ListNode]:
-        if list1 == None:
-            return list2
-        elif list2 == None:
+        if not list2: #this block is necessary to avoid errors starting at #--1
             return list1
+        if not list1:
+            return list2
 
-        if list1.val <= list2.val:
-            pass
-        else:
+        if list1.val > list2.val: #--1
             list1, list2 = list2, list1
 
-        prev = head = list1
-        list1 = list1.next
+        temp = newHead = list1
 
-        while list1:
-            if list1.val <= list2.val:
-                prev.next = list1
-                list1 = list1.next
-                prev = prev.next
+        while list1.next:
+            if list1.next.val > list2.val:
+                list1, list2 = list2, list1.next
             else:
-                list1, list2 = list2, list1
-        prev.next = list2
-        return head
+                list1 = list1.next
+            temp.next = list1
+            temp = temp.next
+
+        temp.next = list2
+
+        return newHead
 # TC: O(m+n)
 # SC: O(1)

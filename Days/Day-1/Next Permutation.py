@@ -37,10 +37,10 @@ class Solution:
 
         # Handling the case where no pivot is found, in which scenario we'll have to reverse the array
         if pivot == None:
-            nums[:] = nums[::-1]  # See how instead of nums = nums[::-1], we are making a copy by writing nums[:]=nums[::-1]. This is important to remember that in python and most other languages we have assignment, deep and the shallow copy of variables, where in, for list,dict,set,tuple by writing oldvar=newvar both the variables start pointing to one same memory address and hence by making changes to one variable the other variable could get affected. Hence while assigning the whole array a new array variable i.e. making a variable equal to an another array variable, we should use the above syntax to avoid further problems. Mark that if only one item at an index has to be changed like arr[2]=2 has to be made or arr=[12,34,3] is to be written, it could be done as written; but only when we have to make the varibale equal to an another variable, we need to be cautious and make their copy like above.
+            nums[:] = nums[
+                      ::-1]  # See how instead of nums = nums[::-1], we are making a copy by writing nums[:]=nums[::-1]. This is important to remember that in python and most other languages we have assignment, deep and the shallow copy of variables, where in, for list,dict,set,tuple by writing oldvar=newvar both the variables start pointing to one same memory address and hence by making changes to one variable the other variable could get affected. Hence while assigning the whole array a new array variable i.e. making a variable equal to an another array variable, we should use the above syntax to avoid further problems. Mark that if only one item at an index has to be changed like arr[2]=2 has to be made or arr=[12,34,3] is to be written, it could be done as written; but only when we have to make the varibale equal to an another variable, we need to be cautious and make their copy like above.
         else:
             # Finding the rightmost successor to pivot in suffix & swapping it with pivot
-            tempVar = None
             for i in range(len(nums) - 1, pivotIndex - 1, -1):
                 if nums[i] > nums[pivotIndex]:
                     temp = nums[pivotIndex]
@@ -65,23 +65,26 @@ S = Solution()
 S.nextPermutation([0, 1, 2, 5, 3, 3, 0])
 S.nextPermutation([1, 2, 3])
 S.nextPermutation([3, 2, 1])
-# Time Complexity: O(n) Considering nums has a length n. Explanation: Finding Pivot in worst case takes n iterations. If we go further into if then we've array reversal which we can assume in worst guess could take O(n) time complexity. If otherwise else is the case, we have one for loop, considering worst case it would have a time complexity of O(n), and further down in the else we encounter two O(n) for reverse suffix and a O(n) for updating the nums with reversed suffix. Hence in if and else, the else case will have worst time complexity in which we'll have in total like O(n)+O(n)+O(n)+O(n) which could be generalized as O(n).
+
+
+# Time Complexity: O(n) Considering nums has a length n. Explanation: Finding Pivot in worst case takes n iterations. If we go further into it then we've array reversal which we can assume in worst guess could take O(n) time complexity. If otherwise else is the case, we have one for loop, considering worst case it would have a time complexity of O(n), and further down in the else we encounter two O(n) for reverse suffix and a O(n) for updating the nums with reversed suffix. Hence in if and else, the else case will have worst time complexity in which we'll have in total like O(n)+O(n)+O(n)+O(n) which could be generalized as O(n).
 # Space Complexity: O(n). Explaination: Starting from the begining of the code, we encounter pivot and pivotIndex variable with constant space complexity. Then we see tempArray, which in worst case would occupy n items; in effect, revTempArray would hold same n number of items. Space Complexity therefor is O(n)+O(n)=O(2n) which can be generalized as O(n)
 
 
-# Approach 2:Improved Space complexity than approach1 as here instead of using temporary array for storing reversed arrays, we're doing that in the place in nums array.
-"""
+# Approach 2:Improved Space complexity than approach1 - instead of using temporary array for storing reversed arrays, we're doing that in the place in nums array.
+
 class Solution:
     def nextPermutation(self, nums: List[int]) -> None:
         # find longest non-increasing suffix
-        right = len(nums) - 1
-        while nums[right] <= nums[right - 1] and right - 1 >= 0:
-            right -= 1
-        if right == 0:
-            return self.reverse(nums, 0, len(nums) - 1)
+        for i in range(len(nums) - 1, -1, -1):
+            if i == 0:
+                nums[:] = nums[::-1]
+                return nums
+            elif nums[i - 1] < nums[i]:
+                break
 
-        # find pivot
-        pivot = right - 1
+            # find pivot
+        pivot = i - 1
         successor = 0
 
         # find rightmost succesor
@@ -101,6 +104,6 @@ class Solution:
             l += 1
             r -= 1
         print(nums)
-"""
+
 # Time Complexity: O(n)
 # Space Complexity: O(1)

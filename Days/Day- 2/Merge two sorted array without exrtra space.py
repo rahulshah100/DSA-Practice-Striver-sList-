@@ -41,8 +41,20 @@ class Solution:
 # Time Complexity: O(mn + n^2)
 # Space Complexity:O(1)
 
-# Approach2: Better than Approach1.
-# 3 pointer method. Starting from back of array M i.e. at the M+Nth index, we'll start storing the bigger value as is evaluated by comparison of pointers a & b, both of which are at M and Nth index respectively. Amongst a and b, whichever pointer's value is chose that pointer is decreased. We'll keep on doing this till b is greater than or equal to 0th index. If b decrease than that, then that'll mean array has been sorted. If b>=0 but a<0 then we'll copy remaining elements pointed by b one by one by decreasing the pointer.
+
+# Approach2: Replace the trailing zero in first array by pushing the second array items there, and then sort the first array
+"""class Solution:
+    def merge(self, nums1: List[int], m: int, nums2: List[int], n: int) -> None:
+        for i in range(n):
+            nums1[m + i] = nums2[i]
+        nums1.sort()
+        print(nums1)"""
+# TC: O(n + (m+n)log(m+n)) Explanation: n for pushing n items from 2nd array into first. Using merge sort we'll then take (m+n)log(m+n) more time to sort the array
+# SC: O(1)
+
+
+# Approach3: Better TC than Approach2.
+# 3 pointer method. Starting from back of first array i.e. at the M+Nth index, we'll start storing the bigger value as is evaluated by comparison of pointers a & b, both of which are at M and Nth index respectively. Amongst a and b, whichever pointer's value is chose that pointer is decreased. We'll keep on doing this till b is greater than or equal to 0th index. If b decrease than that, then that'll mean array has been sorted. If b>=0 but a<0 then we'll copy remaining elements pointed by b one-by-one by decreasing the pointer.
 class Solution:
     def merge(self, A: List[int], m: int, B: List[int], n: int) -> None:
         a, b, write_index = m - 1, n - 1, m + n - 1

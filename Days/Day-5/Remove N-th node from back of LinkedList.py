@@ -47,7 +47,7 @@ class Solution:
 # SC: O(1)
 
 
-# Approach2: Averting the if condition used in Approach1 by creating an Extra Node, and avoiding count method by using 3 pointers. We'll create an extra node, at which dummy, slow and fast pointers will initially be pointing. fast's next would be point at the head and further in a for loop, we'll traverse fast as fast.next uptill nth item. Once fast is at nth item, now we'll start moving slow parallely with fast, uptill fast.next is not detected to be None, at which point we'll set slow's next as it's next.next
+# Approach2: Averting the if condition used in Approach1 by creating an Extra Node, and avoiding count method by using 3 pointers. We'll create an extra node, at which dummy, slow and fast pointers will initially be pointing. fast's next would be pointed at the head and further in a for loop, we'll traverse fast as fast.next uptill nth item. Once fast is at nth item, now we'll start moving slow parallely with fast, uptill fast.next is not detected to be None, at which point we'll set slow's next as it's next.next
 # Definition for singly-linked list.
 # class ListNode:
 #     def __init__(self, val=0, next=None):
@@ -68,7 +68,7 @@ class Solution:
 # SC: O(1) Explanation: Dummy Node is taking 1 constant space, apart from which nothing else occupies any space.
 
 
-# Approach 3: Trading off the use of dummy node from Appraoch2  with an extra if block to handle edge cases. So like Approach 1, we'll seperately take care of edge cases where the very first item of list has to be deleted.
+# Approach 3: Trading off the use of dummy node from Appraoch2 with an extra if block to handle edge cases. So like Approach 1, we'll seperately take care of edge cases where the very first item of list has to be deleted.
 class Solution:
     def removeNthFromEnd(self, head, n):
         fast = slow = head

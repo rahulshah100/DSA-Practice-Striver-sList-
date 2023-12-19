@@ -30,7 +30,7 @@ class Solution:
     def addTwoNumbers(self, l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
         summed=dummy=ListNode(0)
         carry = 0
-        while l1 or l2 or carry:
+        while l1 or l2 or carry: #Only when l1 and l2 are both None and carry is 0 (contrary to while 1, while 0 ends immediately) we'll run out of this while
             sum=carry
 
             if l1:

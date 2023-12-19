@@ -23,8 +23,9 @@ shift+f9: debug python program
 
 ctrl+E: split screen in pycharm
 
-ctrl+f:to Find all occurences of a given character or set of characters on that program
-ctrl+r:to Replace all occurences of a given character or set of characters on that program
+ctrl+f:to Find all occurrences of a given character or set of characters on that program
+ctrl+r:to Replace all occurrences of a given character or set of characters on that program
+ctr+shift+f:to Find all occurrences of a given character or set of characters throughout the whole project
 
 shift+ctrl+arrowKeys: Move the line above or below
 

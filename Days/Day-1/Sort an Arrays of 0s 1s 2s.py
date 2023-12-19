@@ -13,56 +13,65 @@
 # 1 <= n <= 300
 # nums[i] is either 0, 1, or 2.
 #-----------------------------------------------------------------------------------------------------------
-# Approach 1: My Original Approach
+# Approach 1: My Original Approach - Array Hashmap
 from typing import List
 
 """class Solution:
     def sortColors(self, nums: List[int]) -> None:
         # Do not return anything, modify nums in-place instead.
-        
-        hashmap=[0,0,0]
-        for i in nums:
-            if i==0:
-                hashmap[0]=hashmap[0]+1
-            elif i==1:
-                hashmap[1]=hashmap[1]+1
+        hasArr = [0, 0, 0]
+        for i in range(len(nums)):
+            if nums[i] == 0:
+                hasArr[0] += 1
+            elif nums[i] == 1:
+                hasArr[1] += 1
             else:
-                hashmap[2]=hashmap[2]+1
+                hasArr[2] += 1
 
-        count1=0
-        count2=0
-        for j in hashmap:
-            for i in range(j):
-                nums[count2]=count1
-                count2+=1
-            count1+=1
+        ct=0
+        for i in range(len(hasArr)):
+            for j in range(hasArr[i]):
+                nums[ct]=i
+                ct+=1
         print(nums)
 
 S=Solution()
 S.sortColors([2,0,2,1,1,0])
 S.sortColors([2,0,1])
 """
-# Time Complexity:O(2N) given nums array is shown as N. Explaination: the first for loop runs for N times. For the second for loop which is a nested one the outer one will run for 3 times, in effect making the inner one run in-total for N times as the hashmap is storing total N counts i.e.hashmap[0]+hashmap[1]+hashmap[2]=N; So we can it will make the inner for loop run in total for N times and that is what it is doing, so N more time complexity gets added due to this for loop. Therefore, total=N+N=2N Time Complexity.
-# Space Complexity: O(1). We are using hashmap and count1, count2 as variables occupying any extra space in the program. Those 3 having constant space requirement we get O(1) here.
+# Time Complexity:O(2N) given nums array is shown as N. Explanation: the first for loop runs for N times. For the second for loop which is a nested one the outer one will run for 3 times, in effect making the inner one run in-total for N times as the hashmap is storing total N counts i.e.hashmap[0]+hashmap[1]+hashmap[2]=N; Therefore, total=N+N=2N Time Complexity.
+# Space Complexity: O(1). We are using hashmap and ct as variables occupying any extra space in the program. Those having constant space requirement we get O(1) here.
 
 
-# Approach 2: Better Time Complexity
-# If unlike Approach1 where we had to make 2 passes i.e. two for loops: one for storing counts in hashmap and another for storing those many values in nums, if we could make it in one pass then the time complexity would be divided in half. We'll do it by using three pointers lowwer, upper and point i.e. l, u and p respectively which are initiated from index 0,0 and last index of array respectively. These pointer have following use: p is current pointer which will traverse the array. If in traversal we find a 0 we'll chuck it beneath l by swapping it with l's item, and increase l and p. If we find a 2 we'll chuck it after u and decrement u. if it's 1 we'll plainly increment p.
+# Approach2: Bubble Sort - Worst Complexities
 class Solution:
     def sortColors(self, nums: List[int]) -> None:
-        # Initiating indexes as the position of array items.
-        l = p = 0
-        u = len(nums) - 1
-        while p <= u:
-            if nums[p] == 0:
-                nums[p], nums[l] = nums[l], nums[p]
-                p += 1 #---1
-                l += 1
-            elif nums[p] == 2:
-                nums[p], nums[u] = nums[u], nums[p]
-                u -= 1 #note here element swapped from u could be a 2, in case of which if we increment p we could lapse the newly swapped 2, hence we dont increment p. In case of l, at #--1 as we're starting from there we'll never have an item at l which is not quite sorted already, and hence we can increment p too in that case. Say we had a 2 at l, then it can never be a possibility that it'd be swapped with a 0 at p where in further 2 will be placed somewhere in between and p will increment. This holds true because on the way if there was a 2, p must already have swapped it with u.
-            elif nums[p] == 1:
-                p += 1
+        for i in range(len(nums)):
+            for j in range(i + 1, len(nums)):
+                if nums[i] > nums[j]:
+                    nums[i], nums[j] = nums[j], nums[i]
+        print(nums)
+# TC: O(n(n+1)/2)
+# SC: O(1)
+
+
+# Approach 3: Better Time Complexity - Three Pointer
+# If unlike Approach1 where we had to make 2 passes i.e. two for loops: one for storing counts in hashmap and another for storing those many values in nums, if we could make it in one pass then the time complexity would be divided in half. We'll do it by using three pointers lower, upper and current i.e. l, u and c which are initiated from index 0,0 and last index of array respectively. These pointer have the following use: c is current pointer which will traverse the array. It'll work to filter items in a way that all 0s will be before u and all 2s will be after l. Once in traversal c crosses l we know the sorting has been done.
+class Solution:
+    def sortColors(self, nums: List[int]) -> None:
+        u, c, l = 0, 0, len(nums) - 1
+        while c <= l:
+            if nums[c] == 0:
+                nums[c], nums[u] = nums[u], nums[c]
+                u += 1
+            elif nums[c] == 2:
+                nums[c], nums[l] = nums[l], nums[c]
+                l -= 1
+            else:
+                c += 1
+
+            if c < u: #In case where c has been lapsed behind u
+                c = u
         print(nums)
 
 S = Solution()

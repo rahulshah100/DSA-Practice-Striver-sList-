@@ -36,43 +36,46 @@ print(getInvCount(arr, n))
 # Space Complexity: O(1)
 
 
-# Approach2: Decreased Time Complexity at the cost of increased space complexity. Using merge sort, we'll calculate the inversion we have to make while merging the elements.
+# Approach2: Decreased Time Complexity at the cost of increased space complexity. Using a global variable we'll keep count of appropriate inversions taking place in merge sort
 from os import *
 from sys import *
 from collections import *
 from math import *
 
-myInversion = []
+invCt = 0
 
 def merge(arr):
     if len(arr) > 1:
-        mid = len(arr) // 2
-        L = merge(arr[:mid])
-        R = merge(arr[mid:])
+        global invCt    #For accessing a global variable inside the function we declare that same variable with a global keyword in that function.
+        mid = len(arr) // 2 #For altering the global variable in function we have to define it as global whereas for just reading global variable we're not required to
+        L = merge(arr[:mid]) #The above comment holds because as we try to alter the variable inside a function it's (function's) local variables are what is checked and altered
+        R = merge(arr[mid:]) #Which in this case as we dont have any we'll get an error of undefined variable
+        i = j = ct = 0      #Thus here we used global keyword but not at #--1 while returning it from inside a different function
+        while i < len(L) and j < len(R):
+            if L[i] <= R[j]:
+                arr[ct] = L[i]
+                i += 1
+            else:
+                arr[ct] = R[j]
+                invCt += len(L) - i
+                j += 1
+            ct += 1
+        while i < len(L):
+            arr[ct] = L[i]
+            i += 1
+            ct += 1
+        while j < len(R):
+            arr[ct] = R[j]
+            j += 1
+            ct += 1
+        return arr
     else:
         return arr
-    l = u = inv_count = 0
-    for i in range(len(arr)):
-        if l < len(L) and u >= len(R):
-            arr[i] = L[l]
-            l += 1
-        elif l >= len(L) and u < len(R):
-            arr[i] = R[u]
-            u += 1
-        elif L[l] <= R[u]:
-            arr[i] = L[l]
-            l += 1
-        elif L[l] > R[u]:  # Remember only while having to swap elems we've to increment count of inverstions. Hence above arent the cases
-            arr[i] = R[u]
-            u += 1
-            inv_count += len(L) - l  # We cant just do +=1, because if elem at l index in L array is bigger than R[u] then certainly all elem in L (as L is sorted) after l would be bigger too than R[u] and would be needed to be swapped. If we dont do it here, then after this iteration u is increased we wont be ever able to compare indexes from l onwards in L with R[u]
-    myInversion.append(inv_count)  # Append inv_count to myInversion
-    return arr
 
 
 def getInversions(arr, n):
     merge(arr)
-    return sum(myInversion)
+    return invCt #--1
 
 
 # Taking input using fast I/O.
@@ -85,47 +88,48 @@ def takeInput():
 # Main.
 arr, n = takeInput()
 print(getInversions(arr, n))
-# Time Complexity: O(nlogn+n). Explanation: nlogn from what merge sort takes + n from what sum should take in myInversion Array.
-# Space Complexity: O(2n). Explanation: n space is what merge sort takes to temporarily hold the L i.e. Left and R i.e. Right Array. More n space for storing count of inversions in myInversion Array
+# Time Complexity: O(nlogn). Explanation: nlogn from what merge sort takes
+# Space Complexity: O(n). Explanation: n space is what merge sort takes to temporarily hold the L i.e. Left and R i.e. Right Array.
 
 
-# Approach 3: Better TC and SC then Approach2 - In Approach 2 instead of using a global variable as myInversion, making it a part of recursive function call itself to return and summarize all the Inversions.
+# Approach 3: In Approach 2 instead of using a global variable as invCt, making it a part of recursive function call itself
 from os import *
 from sys import *
 from collections import *
 from math import *
 
-
 def merge(arr):
-    inv_ct = 0
     if len(arr) > 1:
         mid = len(arr) // 2
-        L, left_inversion_ct = merge(arr[:mid])
-        R, right_inversion_ct = merge(arr[mid:])
-        inv_ct += left_inversion_ct + right_inversion_ct
+        L, invCt1 = merge(arr[:mid]) #So by default if you return more than 1 item python makes it a tuple and send.
+        R, invCt2 = merge(arr[mid:]) #Now to access all items of tuples we're using equal variables and assigning to tuple.
+        i = j = ct = 0               #This is called tuple unpacking
+        invCt = invCt1 + invCt2
+        while i < len(L) and j < len(R):
+            if L[i] <= R[j]:
+                arr[ct] = L[i]
+                i += 1
+            else:
+                arr[ct] = R[j]
+                invCt += len(L) - i
+                j += 1
+            ct += 1
+        while i < len(L):
+            arr[ct] = L[i]
+            i += 1
+            ct += 1
+        while j < len(R):
+            arr[ct] = R[j]
+            j += 1
+            ct += 1
+        return arr, invCt   #Sent as a tuple of 2 items
     else:
         return arr, 0
-    l = u = 0
-    for i in range(len(arr)):
-        if l < len(L) and u >= len(R):
-            arr[i] = L[l]
-            l += 1
-        elif l >= len(L) and u < len(R):
-            arr[i] = R[u]
-            u += 1
-        elif L[l] <= R[u]:
-            arr[i] = L[l]
-            l += 1
-        elif L[l] > R[u]:
-            arr[i] = R[u]
-            u += 1
-            inv_ct += len(L) - l  # We cant just do +=1, because if elem at l index in L array is bigger than R[u] then certainly all elem in L (as L is sorted) after l would be bigger too than R[u] and would be needed to be swapped. If we dont do it here, then after this iteration u is increased we wont be ever able to compare indexes from l onwards in L with R[u]
-    return arr, inv_ct
 
 
 def getInversions(arr, n):
-    arr, inv_ct = merge(arr)
-    return inv_ct
+    sortedArr, invCt = merge(arr)
+    return invCt
 
 
 # Taking input using fast I/O.

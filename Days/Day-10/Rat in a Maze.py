@@ -40,94 +40,41 @@
 # 2 ≤ N ≤ 5
 # 0 ≤ m[i][j] ≤ 1
 # ------------------------------------------------------------------------------------------------------------------------------------
-# Approach1: Using an extra `visited` array that has m rows with n cols, wherein each items is 1 and a `moves` string along with current row and current col as params we chart out a recursive function. Initially with row, col as 0, 0 this function is called where it checks first for base condition wherein if row, col = n-1, n-1 meaning we are at destination/bottom-right block and that's where we append moves into an answer array. If it's not base condition, we will expand flow of our execution in 4 directions: D, L, R, U as is Lexographical order, to use which we have been asked in Quesition as a Note. First we'll check for D if the new coordinates don't violate condition of visiting an already visited index, coordinates being out of the grid and there being a 0 in the givenGrid at newCordinates in either of which cases we'll return False, or else True. For a True, the new Direction is safe to take and so first we block the new cordinate in visited array with a 0 and put a recursive call with updated coordinates, updated visitedArray and moves appended with a D. Below recursion we mend back the visitedArray by updating it's checked coordinates with a 0 showing they're unvisited. Same for other 3 directions. At the end we return ans Array.
+# Approach1: To keep track of not repeating directions we'll use a visitedArr which would be of same dimension as to given maze/m but filled with 0s initially. Now a catch to this question is Lexicographic order of direction only gives us correct answer that is if we check for D,L,R,U; while L,R,D,U gives incorrect answer. So starting with row, col as 0,0 in a helperfunc we'll check if currRow and currCol is not 0 in given maze, otherwise we'll just return. Conversely, if maze for the current indices is 1 we'll recursively call this function for 'D' direction i.e. row-1 and col; and to reflect this change we'll keep and append a temp array which will now have a 'D', alongside making this row,col entry as 1 in visitedArr. While backtracking if this call returns we'll pop temp and append 'L' and recursively call a function for row, col-1. Similarly, we'll do for 'R' and 'U' directions. After which if we still had to go backtrack we'll undo visitedArr for this index by making it 0. Base condition is where row==col==len(maze)-1 and maze[row][col]==1. Alongside returning when currRow and currCol is 0, we'll also add onto it the conditions where visited is 1 or row<0 or row>=len(maze) or col<0 or col>=len(maze).
 class Solution:
     def findPath(self, m, n):
-        visited = [[1 for i in range(n)] for i in range(n)]
-        ans = []
+        return self.helperfunc([], [[0 for i in range(n)] for j in range(n)], m, 0, 0, [])
 
-        if m[0][0] == 0: #This has to be put because below for down which is first condition, we are only checking for incremented column itself where this case will lapse
-            return ans
+    def helperfunc(self, temp, visitedArr, maze, row, col, ansArr):
+        if row == col == len(maze) - 1 and maze[row][col] == 1:
+            ansArr.append(''.join(temp))
+            return ansArr
+        elif row < 0 or col < 0 or row >= len(maze) or col >= len(maze[0]) or visitedArr[row][col] == 1 or maze[row][col] == 0:
+            return [] #And not return so that in case where (m,n) are ([0,1,1],1) we wont get None returned
 
-        def helperFunc(row, col, visited, moves):
-            if row == n - 1 and col == n - 1:
-                ans.append(moves)
+        visitedArr[row][col] = 1
+        temp.append('D')
+        self.helperfunc(temp, visitedArr, maze, row + 1, col, ansArr)
+        temp.pop()
 
-            # down
-            if check(row + 1, col, m, visited, n):
-                visited[row][col] = 0
-                helperFunc(row + 1, col, visited, moves + 'D')
-                visited[row][col] = 1
-            # left
-            if check(row, col - 1, m, visited, n):
-                visited[row][col] = 0
-                helperFunc(row, col - 1, visited, moves + 'L')
-                visited[row][col] = 1
-            # right
-            if check(row, col + 1, m, visited, n):
-                visited[row][col] = 0
-                helperFunc(row, col + 1, visited, moves + 'R')
-                visited[row][col] = 1
-            # up
-            if check(row - 1, col, m, visited, n):
-                visited[row][col] = 0
-                helperFunc(row - 1, col, visited, moves + 'U')
-                visited[row][col] = 1
+        temp.append('L')
+        self.helperfunc(temp, visitedArr, maze, row, col - 1, ansArr)
+        temp.pop()
 
-        helperFunc(0, 0, visited, "")
-        return ans
+        temp.append('R')
+        self.helperfunc(temp, visitedArr, maze, row, col + 1, ansArr)
+        temp.pop()
 
+        temp.append('U')
+        self.helperfunc(temp, visitedArr, maze, row - 1, col, ansArr)
+        temp.pop()
 
-def check(currRow, currCol, givenMatrix, visitedMatrix, n):
-    if 0 <= currRow < n and 0 <= currCol < n and givenMatrix[currRow][currCol] == 1 and visitedMatrix[currRow][currCol] == 1:
-        return True
-    return False
-
+        visitedArr[row][col] = 0
+        return ansArr
 
 S = Solution()
-print(S.findPath([[1, 0, 0, 0],
-                  [1, 1, 0, 1],
-                  [1, 1, 0, 0],
-                  [0, 1, 1, 1]], 4))
-
+print(S.findPath([[1, 0, 0, 0], [1, 1, 0, 1], [1, 1, 0, 0], [0, 1, 1, 1]], 4))
+print(S.findPath([[1, 0], [1, 0]], 2))
+print(S.findPath([[0, 1, 0], [0, 0, 0],[1,1,1]], 3))
 # TC: O(4^(mn)) Explanation: For each call we have 4 more calls to unveil. In each of these 4 calls there are further 4 more calls and so on. There being mn total items, here total calls are like 4(4(4(4.... total of mn times which gives us 4^mn.
-# SC: O(3mn) Explanation: for max depth of recursion it could be traversing all the elements i.e.mn. Plus visited array takes up mn more space. Given recusion's depth, move could be storing 1 direction from each call storing a total of mn directions.
-
-
-
-# Approach2: Readability Improvements to Approach1- just reducing 4 if-statements by one for loop. We can use 2 arrays each holding difference that needs to be accounted in row and col respectively to undergo next step as either of DLRU. We'll also use a string to store "DLRU" so to be able to fetch the direction that can be appended into moves, once we're iteraing through for-loop. With 2 arrays what was meant is for taking down how row,col becomes=>row+1,col so 2 arrays will store [1] [0]. Similaryl, collectively for all directions, our 2 arrays are- [1, 0, 0, -1] [0,-1,1,0]. This will not at all create difference in TC. With SC too, constant extra space for di, dj and lexOrder is only added which are ignored as they're constant.
-class Solution:
-    def findPath(self, m, n):
-        visited = [[1 for i in range(n)] for i in range(n)]
-        ans = []
-        di=[1, 0, 0, -1]
-        dj=[0,-1,1,0]
-        lexOrder="DLRU"
-
-        if m[0][0] == 0:
-            return ans
-
-        def helperFunc(row, col, visited, moves):
-            if row == n - 1 and col == n - 1:
-                ans.append(moves)
-
-            for i in range(4):
-                if check(row + di[i], col + dj[i], m, visited, n):
-                    visited[row][col] = 0
-                    helperFunc(row + di[i], col + dj[i], visited, moves + lexOrder[i])
-                    visited[row][col] = 1
-
-        helperFunc(0, 0, visited, "")
-        return ans
-
-
-def check(currRow, currCol, givenMatrix, visitedMatrix, n):
-    if 0 <= currRow < n and 0 <= currCol < n and givenMatrix[currRow][currCol] == 1 and visitedMatrix[currRow][currCol] == 1:
-        return True
-    return False
-
-
-S = Solution()
-print(S.findPath([[1 ,1],[1,1]], 2))
-# TC: Same as Approach1
-# SC: Same as Approach1
+# SC: O(3mn) Explanation: for max depth of recursion it could be traversing all the elements i.e. mn. Plus visitedArr takes up mn more space. Given recusion's depth, temp could be storing 1 direction from each call storing a total of mn directions in worst case.

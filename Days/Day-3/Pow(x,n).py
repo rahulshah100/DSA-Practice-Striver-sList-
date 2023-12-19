@@ -48,12 +48,12 @@ class Solution:
 # TC and SC same as approach 1
 
 
-# Approach3: Better Time complexity. An even power equation for npowerm could be written as (n*n)power(m/2). Eg: 6^8 => (6*6)^4. Odd Power equation npowerm can be written as n*(npower(m-1)) Eg: 6^7=>6*(6^6). If we have 6^7 we could see its flow as: 6^7=>6*(6^6)=>6*((6*6)^3)=>6*(36*((36)^2))=>216*((36*36)^1)=>216*1296 as we encounter n=1, we'll stop going further in recursion.
+# Approach3: Better Time complexity. In approach 1 we were doing x*x*x for n times. Instead, if we do x*=x for logn times we'll get same answer. That is in approach 1 we did tot=tot*x for n times i.e. Starting with tot=1, for n=4 and x=2 1*2=2 we did 2*2 i.e. 4 then 4*2 i.e. 8 and then 8*2 i.e. 16. How if we do x*=x that is 2*=2 i.e. 4 and then 4*=4 i.e. 16. For this an even power equation for npowerm could be written as (n*n)power(m/2). Eg: 6^8 => (6*6)^4. Odd Power equation npowerm can be written as n*(npower(m-1)) Eg: 6^7=>6*(6^6). If we have 6^7 we could see its flow as: 6^7=>6*(6^6)=>6*((6*6)^3)=>6*(36*((36)^2))=>216*((36*36)^1)=>216*1296 as we encounter n=1, we'll stop going further in recursion.
 class Solution:
     def myPow(self, x: float, n: int) -> float:
-        if n == 0:
+        if n == 0:  # As n can be 0, we are not using `if n==1: return x` as base case or else when it'll be 0 we'd have to add one more if condition
             return 1
-        elif n > 0 and n % 2 == 0:  # NOTE: Here x*x*self.myPow(x, n // 2) cant work coz `2^8=>2*2*(2^4)=>2^(1+1+4)=>2^6!=2^8` but `2^8=(2*2)^4=>(2^2)^4=>2(2*4)=>2^8`
+        elif n > 0 and n % 2 == 0:  # NOTE: Here x*x*self.myPow(x, n // 2) can't work coz `2^8=>2*2*(2^4)=>2^(1+1+4)=>2^6!=2^8` but `2^8=(2*2)^4=>(2^2)^4=>2(2*4)=>2^8`
             return self.myPow(x * x, n // 2)
         elif n > 0 and n % 2 != 0:
             return x * self.myPow(x * x, (n - 1) // 2)

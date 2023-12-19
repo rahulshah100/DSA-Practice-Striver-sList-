@@ -1,6 +1,6 @@
 # https://www.codingninjas.com/studio/problems/1062679?topList=striver-sde-sheet-problems&utm_source=striver&utm_medium=website
 
-# You are given two positive integers. You have to return the 'nth' root of 'm'. If the 'nth root is not an integer, return -1.
+# You are given two positive integers. You have to return the 'nth' root of 'm'. If the nth root is not an integer, return -1.
 
 # Example1:
 # Input: ‘n’ = 3, ‘m’ = 27
@@ -18,7 +18,7 @@
 # 1 <= m <= 10^9
 # Time Limit: 1 sec.
 # ------------------------------------------------------------------------------------------------------------------------
-# Approach1: Run a for loop to check for all numbers from 1 to m if they're multiplied by themselves for n times, and if either of them equals to m, we return this number as answer. Outside this for loop we return -1.
+# Approach1: Run a for loop to check for all numbers from 1 to m if they're multiplied by themselves for n times, and if either of them equals to m, we return this number as answer. Outside this for loop we return -1. Note: Constraints are important and we can see n can't be negative or that had to be taken into account
 def NthRoot(n: int, m: int) -> int:
     for i in range(1, m + 1):
         tot = 1
@@ -33,7 +33,7 @@ print(NthRoot(3, 27))  # O/P: 3
 # SC: O(1)
 
 
-# Approach2: Binary Search- We'll run Binary search with an upper as the givenNumer- m and lower as 1, coz not 1 and anything less than 1 i.e. say 0 will mean taking into account the answer to be in decimals too but question states only if whole number is answer then to return it or else to return -1, so no need to start from 0. Further we'll find mid for lower, upper using an integer division, and if n times mid is equal to m then we return mid, if m times m is greater than m then we reduce upper to mid-1. Or else we bump lower to mid+1. The process of finding mid and updating lower, upper will go on till lower is less than or equal to upper as when they're equal that might be the mid, so we do take into account for lower to be upto higher as well. Outside while we'll return -1.
+# Approach2: Binary Search - We'll run Binary search with an upper as the givenNumer - m and lower as 1, coz not 1 and anything less than 1 i.e. say 0 will mean taking into account the answer to be in decimals too but question states only if whole number is answer then to return it or else to return -1, so no need to start from 0. Further we'll find mid for lower, upper using an integer division, and if n times mid is equal to m then we return mid, if m times m is greater than m then we reduce upper to mid-1. Or else we bump lower to mid+1. The process of finding mid and updating lower, upper will go on till lower is less than or equal to upper as when they're equal that might be the mid, so we do take into account for lower to be up-to higher as well. Outside while we'll return -1.
 def NthRoot(n: int, m: int) -> int:
     l, u = 1, m
     while u >= l:
@@ -41,7 +41,7 @@ def NthRoot(n: int, m: int) -> int:
         nTimesMid = 1
         for i in range(n):
             nTimesMid *= mid
-            if nTimesMid>m: #If we've discovered that u would have to be modified than let's limit the effort here mow.
+            if nTimesMid>m: #If we've discovered that u would have to be modified then let's limit the effort here now.
                 break
         if nTimesMid == m:
             return mid

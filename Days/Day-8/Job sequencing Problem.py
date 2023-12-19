@@ -37,7 +37,6 @@ class Solution:
         # for i in Jobs:
         #     jobsArr.append([i.id, i.deadline, i.profit])
         jobsArr=[[i.id,i.deadline,i.profit] for i in Jobs] #--1
-        print('jobsArr',jobsArr)
         jobsArr.sort(key=lambda x: x[2], reverse=True)
         ct = totProf = 0
         hash = {}

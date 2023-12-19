@@ -29,7 +29,7 @@
 # intersectVal is 0 if listA and listB do not intersect.
 # intersectVal == listA[skipA] == listB[skipB] if listA and listB intersect.
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-# Approach 1: For each node of linked list 2, traverse the entire linked list 1 and see if it matches with selected node of linked list 2.
+# Approach 1: 2 while loop to traverse each headB node for each node of headA node. At any point if they match return that node or at the end return None
 # Definition for singly-linked list.
 # class ListNode:
 #     def __init__(self, x):
@@ -38,20 +38,19 @@
 
 class Solution:
     def getIntersectionNode(self, headA: ListNode, headB: ListNode) -> Optional[ListNode]:
-        headBB = headB
-        while headBB:
-            headAA = headA
-            while headAA:
-                if headAA == headBB:
-                    return headAA
-                headAA = headAA.next
-            headBB = headBB.next
+        while headA:
+            temp = headB
+            while temp:
+                if temp == headA:
+                    return temp
+                temp = temp.next
+            headA = headA.next
         return None
-# TC:O(m*n) Explanation: For linkelist B with m items and linkedlist A with n. We'll run n items for m times, in worst case to match all nodes from list A with head Node of list B
+# TC:O(m*n) Explanation: For linkedlist B with m items and linkedlist A with n. We'll run n items for m times, in worst case to match all nodes from list A with head Node of list B
 # SC: O(1) Explanation: Only two new pointers used which are referencing and not taking any more space at all
 
 
-# Approach 2: Using List hashmap. Iterate through any one linked list and store the nodes i.e. objects in the hashmap. Further, traverse over the remaining linked list and check for all of it's node, if they are found in hashmap. If so, return the node.
+# Approach 2: Using Set hashmap. Iterate through any one linked list and store the nodes i.e. objects in the hashmap. Further, traverse over the remaining linked list and check for all of it's node, if they are found in hashmap. If so, return the node.
 # Definition for singly-linked list.
 # class ListNode:
 #     def __init__(self, x):
@@ -60,37 +59,20 @@ class Solution:
 
 class Solution:
     def getIntersectionNode(self, headA: ListNode, headB: ListNode) -> Optional[ListNode]:
-        hashmap=[]
+        hashmap=set()
         while headA:
-            hashmap.insert(0,headA)
+            hashmap.add(id(headA))  #we could have head Node i.e. an object being stored directly, but having simple items is more efficient
             headA=headA.next
         print(hashmap)
         while headB:
-            if headB in hashmap:
+            if id(headB) in hashmap:    #lookup in set and dictionary is O(1) unlike array's O(n) times so we used set here. Could've used hashmap too.
                 return headB
-            headB=headB.next
-        return None
-# TC: >O(n+m) Explanation: Traversing n nodes to store LL1 in the hashmap, and traversing m nodes to further check for LL2 if any of the nodes are present in the hashmap, will make us have n+m TC. Also the checking in hashmap i.e. 'in' wont likely work in constant space here, as the items stored in our list type hashmap are objects, and so hashing them might be complicated resulting in more than O(1) TC, which will add onto m+n Time and make resulting TC to be more than m+n.
+            headB=headB.next #By default after while None is returned
+# TC: >O(n+m) Explanation: Traversing n nodes to store LL1 in the hashmap, and traversing m nodes to further check for LL2 if any of the nodes are present in the hashmap, will make us have n+m TC. Also, the checking in hashmap i.e. 'in' won't likely work in constant space here, as the items stored in our list type hashmap are objects, and so hashing them might be complicated resulting in more than O(1) TC, which will add onto m+n Time and make resulting TC to be more than m+n.
 # SC: O(n) Explanation: Given that we're storing linked list 1 in hashmap, we'll store n items in the given hashmap resulting in O(n) space complexity.
 
 
-# Approach 3: Same as Approach2, just by using Dict hashmap. Using id of objects as identifying factor for common nodes
-class Solution:
-    def getIntersectionNode(self, headA: ListNode, headB: ListNode) -> Optional[ListNode]:
-        hashmap={}
-        while headA:
-            hashmap[id(headA)]=True
-            headA=headA.next
-        print(hashmap)
-        while headB:
-            if id(headB) in hashmap:
-                return headB
-            headB=headB.next
-        return None #Not mentioning this is totally fine as by default as function exhaust None is only returned
-# TC: O(n+m) Explanation: Here, keys are simple characters, unlike objects in Appraoch2. So hashing/finding the item in hashmap will happen in O(1) TC.
-# SC: O(n)
-
-# Approach 4: Considering the possibility of linked lists having different lengths, we'll firstly find their length and will subtract the difference. We'll make the longer linked list's head come forward by the difference. From here on, we'll move heads of both the linked lists simultanously while checking if they are pointing at the same location, in which case we return the head. If not, we return None.
+# Approach 3: Considering the possibility of linked lists having different lengths, we'll firstly find their length and will subtract the difference. We'll make the longer linked list's head come forward by the difference. From here on, we'll move heads of both the linked lists simultaneously while checking if they are pointing at the same location, in which case we return the head. If not, we return None.
 # Definition for singly-linked list.
 # class ListNode:
 #     def __init__(self, x):
@@ -128,7 +110,7 @@ class Solution:
 # SC: O(1)
 
 
-# Approach 5: Same as Approach 4 but better code implementation. So here, we will shift the heads of the two given linked lists, before they'll be at the same lengths in different linked lists than their original ones; from where on we'll further traverse their corresponding lists simultanously, and will either return None as both heads exhaust traversing all the nodes, or if before exhausting they match then we'll return the matching node. In brief, for 2 given linked lists we'll traverse them simultanously and when one of their's head points None but the other is not, we'll shift the head of the linked list pointing to null to the start of the other linked list. In general, as we traverse both lists simultaneoulsy, the shorter list will be exhausted first and so will be shifted to start of longer list. Once head1 of shorter list has shifted to start of longer, the longer list's head would still have some item's to exhaust, after which it'll be at starting of shorted linked list; in which case now they have equal elements in front of them. So from this iteration onwards, either they'll point to None i.e.reach the end together or will find a common item. In either case, as the heads match we return them.
+# Approach 4: Same as Approach 4 but better code implementation. So here, we will shift the heads of the two given linked lists, before they'll be at the same lengths in different linked lists than their original ones; from where on we'll further traverse their corresponding lists simultaneously, and will either return None as both heads exhaust traversing all the nodes, or if before exhausting they match then we'll return the matching node. In brief, for 2 given linked lists we'll traverse them simultaneously and when one of their heads point to None but the other is not, we'll shift the head of the linked list pointing to null to the start of the other linked list. In general, as we traverse both lists simultaneously, the shorter list will be exhausted first and so we'll be shifted to start of longer list. Once head1 of shorter list has shifted to start of longer, the longer list's head would still have some item's to exhaust, after which it'll be at starting of shorter linked list; in which case now they have equal elements in front of them. So from this iteration onwards, either they'll point to None i.e.reach the end together or will find a common item. In either case, as the heads match we return them.
 class Solution: #Consider 5,6,7 and 2,1,11,6,7. list1 will be None when list2 is 6. Further list 1 proceeds as 2,1,11,6,7 whereas list2 is 7,None,5,6,7. See 6,7 comes as 4th and 5th sequence for both pointers.
     def getIntersectionNode(self, headA: ListNode, headB: ListNode) -> Optional[ListNode]:
         headAA, headBB = headA, headB

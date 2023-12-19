@@ -24,7 +24,7 @@
 # --------------------------------------------------------------------------------
 # Note: It being unfair, due to language benefits, otherwise we can run a for loop and input all string chars into a set and further just return length of set.
 
-# Approach1: Using 2 for loops compute all possible substrings. Count and return maxlength amongst non repeat sub-strings.
+# Approach1: Using 2 for loops and a string hashMap to compute all possible substrings. Count and return maxlength amongst non repeat sub-strings.
 class Solution:
     def lengthOfLongestSubstring(self, s: str) -> int:
         maxLen=0
@@ -39,51 +39,65 @@ class Solution:
         return maxLen
 
 # S=Solution()
-# S.lengthOfLongestSubstring("pwwkew")
-# S.lengthOfLongestSubstring("abcabcbb")
 # S.lengthOfLongestSubstring("bbb")
 # TC: O(n^3) Explanation: inside 2 for loops, we're running an if statement which'll take n time too, everytime.
 # SC: O(n) Explanation: using currStr in worst case will take n space.
 
-# Approach2: Using 2 Pointers. We will use a for loop to provide an increasing right pointer, and an explicit l pointer starting from 0th index. right pointer will keep increasing storing all the unique elems in a temporary array. With every right pointer increment we will keep checking for updated length of this unique substring by differnce b/n right and left pointer, and incase it exceeds maxLen we'll update maxLen. If an elem is found repeating, we will keep incrementing l in temporary array making elems at all those indices None untill we remove the elem that got repeated. Now we are again all set to increment right pointer and start underaking counting of a new string. Idea here is to constrain a unique substring between l and increasing right pointer.
+
+# Approach2: Computing all possible substrings using 2 for-loop and a set hashMap.
+"""
 class Solution:
     def lengthOfLongestSubstring(self, s: str) -> int:
+        globMax = 0
+        for i in range(len(s)):
+            hashSet = set()
+            for j in range(i, len(s)):
+                if s[j] not in hashSet:  #Set lookup takes O(1) in python
+                    hashSet.add(s[j])
+                    globMax = max(globMax, j + 1 - i)
+                else:
+                    break
+        return globMax
+"""
+# TC: O(n^2)
+# SC: O(n)
+
+
+# Approach3: Using a Pointers with a hashMap. Trick: If we're using 2 for loops, one way to reduce one for loop is very intuitive which is to use a hashmap.
+# Here we can think of making a prefix hashDict where we store an elem and across it the index at which it is found as a pair, as we traverse in single for-loop through entire array. Each time we'll check if the current item is found in hashDict, which if the case we can update a pointer say l to the specified location across this item in hashDict+1. Otherwise, we'll simply keep incrementing ct to keep counting unique chars as ct=max(currentIndex+1-l,ct).
+"""class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        hashMap = {}
+        globMax = 0
+        l = 0
+        for i in range(len(s)):
+            if s[i] in hashMap and hashMap[s[i]] >= l: #hashMap[s[i]] >= l makes sure for examples like 'tmmzuxt' where when we encounter second m, l is shifted to index 2 that when we're at last t and find a repeating item t in our hashDict at 0th index, we're not shifting l to 2.
+                l = hashMap[s[i]]+1
+            hashMap[s[i]]=i
+            globMax = max(globMax, i + 1 - l)
+        return globMax"""
+# TC: O(n)
+# SC: O(n)
+
+
+# Approach 4: Same as Approach3 but using hashArr. Just for understanding concepts better.
+# We will use a for loop to provide an increasing right pointer, and an explicit l pointer starting from 0th index. Right pointer will keep increasing and storing all the unique elems in  array. With every right pointer increment we will keep checking for updated length of the current unique substring by difference b/n right and left pointer, and incase it exceeds maxLen we'll update maxLen. If an elem is found repeating, we will keep incrementing l in temporary array making elems at all those indices None untill we remove the elem that got repeated. Now we are again all set to increment right pointer and start undertaking counting of a new string. Idea here is to constrain a unique substring between l and increasing right pointer.
+class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        hashMap = []
         maxLen = 0
         l = 0
-        tempArr = []
         for i in range(len(s)):
-            if s[i] in tempArr:
-                while s[i] in tempArr:
-                    tempArr[l]=None
-                    l += 1
-                tempArr.append(s[i]) #So that s[i] from current iteration doesnt get lapsed or temparray's size and indexes will faulter
+            if s[i] not in hashMap:
+                maxLen = max(maxLen, i + 1 - l)
             else:
-                tempArr.append(s[i])
-                maxLen = max(maxLen, i - l + 1)
+                while s[i] in hashMap: #Array lookup takes O(n)
+                    hashMap[l] = None
+                    l += 1
+            hashMap.append(s[i])
         return maxLen
 
 # S=Solution()
-# S.lengthOfLongestSubstring("pwwkew")
-# S.lengthOfLongestSubstring("abcabcbb")
 # S.lengthOfLongestSubstring("bbb")
-# TC:O(2n) Explanation: collecively the for and it's inner while could take 2n time, as for could iterate over an elem and while will increment uptill for. For will again increment say 2 iterations and now while has to catch up with for and runs twice. Thus collectively for+while will take 2n time.
+# TC:O(2n) Explanation: collectively the for and it's inner while could take 2n time, as for could iterate over an elem and while will increment uptill for. For will again increment say 2 iterations and now while has to catch up with for and runs twice. Thus, collectively for+while will take 2n time.
 # SC:O(n) Explanation: An extra arr variable.
-
-
-# Approach3: Improved time complexity, compromised space complexity than Approach2 - by replacing the array with a dictionary. Where in approach 2 we had to move left all the way till way find an item which is pointed by right, if we can store the indexes of occurence of items, we can then directly place left at an index after where the occurence of the item is shown. This will save the whole while loop inside for loop.
-# from typing import
-class Solution:
-    def lengthOfLongestSubstring(self, s: str) -> int:
-        ct = l = 0
-        hash = {}
-        for i in range(len(s)):
-            if s[i] in hash:
-                l = max(l,hash[s[i]] + 1) #Two things: 1).We did hash[s[i]]+1 as for ith iteration of for loop we discovered that s[i] elem is repeating/is present in hash. Hence we have to circumvent this item so to have a unique substring. Therefore we do hash[s[i]]+1. 2) For updating l, we're taking max of l and hash[s[i]]+1 to ensure the new substring doesnt start from a point where although the last encountered repeat is circumvent but we're ending with some other repeating elems in between. Eg: abba for i at 2nd index we will find b already present at 1st index. Hence here, l would be updated to index 2. Furtehr when i is at index 3, we'll encounter 'a' to find it having repeated at index 0. Here we wont want l to be updated to 1st index just to circumvent 'a' in which case bba would become our string from l to i, which now has bb repeating. But in this case the already updated l's value i.e index 2 is optimal already as it doesnt involve a repeating.
-            hash[s[i]] = i
-            ct = max(ct, i - l + 1)
-        return ct
-
-S = Solution()
-print(S.lengthOfLongestSubstring("abba"))
-# TC:O(n) Explanation: n time for right to traverse n elements.
-# SC:O(n) Explanation: Dict variable taking n extra space.

@@ -32,49 +32,54 @@
 # board[i][j] is a digit or '.'.
 # It is guaranteed that the input board has only one solution.
 # -----------------------------------------------------------------------------------------------------------------------------------
-# Approach1: We'll traverse every row and in that every col, starting from 1st row 1st col i.e. index=0,0. If given col already has a value that is it is not "." we go to next column directly. Thus running out on all the cols will make us put a recursive call onto the function with incremented row, wherein again from 0th column we will traverse. Base condition is where in the function we discover row to be 9, that means we've been able to have all rows filled. While traversing a row and upon finding an empty column we'll iterate all values from 1 to 9 and see if any of them could be accomodated there. If so, we'll place that value for currRow and currColumn in the currBoard. But here finding one fitting value wont mean there could not be any other suitable values too. So to iterate over all possible solutions, at this spot we call a recursive function call with incremented column which will lead us forward with this value at currCol whereas the present for loop would keep checking for the remaining items at the same spot to be suitable. With recursive calls as they execute further either going down we'll encounter a situation where none of the items could be suitable for upcoming vacant spots or we'll traverse all the way through and hit the base condition. In case none of the items could fit we return false, and where we hit base case we return the currBoard. And as we're only asked one solution through constraints, so wherever we are putting a recursive calls we'll put an if-condition to see if returned value is array or a false. If array we'll return the currBoard, if false, we'll do nothing so further iterations could continue.
+# Approach1: We'll traverse through the given board in left to right fashion starting first row, then second row and so on... where using a helperfunc, in one function call we'll check for a singular coordinate i.e. a row, col index and try finding it a valid value. For finding valid value, over this coordinate we'll check for all values from 1 to 9 if they 1) aren't repeated in that row, or col 2)in that 3x3 block where current coordinate belong. If this is true it means we found a value for this coordinate, and we make a new function call for next col in same row. Also at the start of helpfunc we'll check if current coord doesn't hold a number already, because if so it's given as a part of question then we don't wanna change that and therefor we don't do anything but return a new func call with incremented col in same row. Now chances also are when we find a suiting value for row,col=0,7 and it further found suiting value for 0,8 and then 1,0 but for 1,1 we cant find any suiting value with this arrangement hence as we backtrack we check if we are coming from when row has been made 9 i.e. all the way through or from somewhere in between if it's somewhere in between then before backtracking we wanna make the changed value back to '.' at their corresponding coordinate. And hence at end of func we return False while for row==9 we return True. Thus conditions in helperfunc are to check at the start whether row==9 or col==9 in which cases we'll return True, or a new func call with incremented row and col made as 0, respectively.
 from typing import List
-
 
 class Solution:
     def solveSudoku(self, board: List[List[str]]) -> None:
-        def helperFunc(row, col, currBoard):
-            if row == 9: return currBoard
+        return self.helperfunc(0, 0, board)
 
-            for currCol in range(col, 9): #cheking all columns in currentRow
-                if currBoard[row][currCol]!=".": continue
-                for item in range(1, 10): #for a given empty column trying out all possible values
-                    if check(row, currCol, item, currBoard):
-                        currBoard[row][currCol] = str(item)
-                        if helperFunc(row, currCol + 1, currBoard):  # --1  #In case value matched we put it at this index and start checking for next cols
-                            return currBoard
-                        currBoard[row][currCol] = "."  # So that in case where #--1 went to next call with 4,7 (row,col) where it could put 8 and #--1 got further called from there to find no matching cases for 4,4. So whe 4,4 comes back to 4,7 that's where at 4,7 next item is checked i.e. 9 and it didnt pass. So we go back to 4,7's parent say 4,6 now to check next item at 4,6 but here's where now we'll already have a 9 at 4,7 which will change the currBoard going forward.
-                return False #If none of items matched for any empty row col, no solution with this arrangement
-            if helperFunc(row + 1, 0, currBoard): # where function call receives column to be 10 i.e. prior row has been entirely traversed
-                return currBoard
+    def helperfunc(self, row, col, board):
+        if row == 9:
+            return True  # The puzzle is solved
 
-        return helperFunc(0, 0, board)
+        if col == 9:
+            return self.helperfunc(row + 1, 0, board)
 
+        if board[row][col] == ".":
+            for j in range(1, 10):
+                if self.validate(str(j), row, col, board):
+                    board[row][col] = str(j)
+                    if self.helperfunc(row, col + 1, board):
+                        return board  # Puzzle is solved
+                    board[row][col] = "."  # Backtrack if the current choice doesn't lead to a solution
+        else:
+            return self.helperfunc(row, col + 1, board)
 
-def check(currRow, currCol, item, board):
-    for i in range(0,9):
-        # check row
-        if board[currRow][i]==str(item): return False
-        # check col
-        if board[i][currCol]==str(item): return False
-        # check for that 3*3 unit where currRow, currCol belongs
-        if board[(3*(currRow//3)) + (i//3)][(3*(currCol//3)) + (i%3)]==str(item): return False #Translating i=5 and currRow, currCol= 7, 3: 7//3=>2 shows second unit vertically (starting from 0,1,2). Each unit is 3 rows so to get an overall starting index of row=>2(3)=>6 shows current Row; Similarly 3//3=> 1 shows 1st unit horizontally out of 0,1,2. Each unit is 3 columns so 1(3)=3 shows current Col. Incorporating the current i count. 5//3=>1 shows row count out of 0,1,2 in current unit. 5%3=>2 shows col count out of 0,1,2 in current unit.
-    return True
+        return False  # No valid choice found for the current cell
+
+    def validate(self, value, row, col, board):
+        # check for rows, cols
+        for i in range(9):
+            if board[row][i] == value or board[i][col] == value:
+                return False
+
+        # check for the same block
+        blockStart_Row = (row // 3) * 3
+        blockStart_Col = (col // 3) * 3
+        for i in range(3):
+            for j in range(3):
+                if board[blockStart_Row + i][blockStart_Col + j] == value:
+                    return False
+
+        return True
 
 S = Solution()
-print(S.solveSudoku([["5", "3", ".", ".", "7", ".", ".", ".", "."],
-                     ["6", ".", ".", "1", "9", "5", ".", ".", "."],
-                     [".", "9", "8", ".", ".", ".", ".", "6", "."],
-                     ["8", ".", ".", ".", "6", ".", ".", ".", "3"],
-                     ["4", ".", ".", "8", ".", "3", ".", ".", "1"],
-                     ["7", ".", ".", ".", "2", ".", ".", ".", "6"],
-                     [".", "6", ".", ".", ".", ".", "2", "8", "."],
-                     [".", ".", ".", "4", "1", "9", ".", ".", "5"],
-                     [".", ".", ".", ".", "8", ".", ".", "7", "9"]]))
-# TC: O(n(9^(nm))) Explanation: Here we have 9 possible items that could be checked for 1 index. Further each of those 9 possibilities will offer to choose for 9 more times so it is like 9(9(9...) given such n*m items in total we'll have 9(9(.. for length of n*m also meaning it could be written as 9^(nm) is time for all recursive calls. Further in each call we have a check function utilizing a for loop adding to n complexity for each of 9^(nm) recursive calls so total TC becomes n(9^(nm))
+board = [["5", "3", ".", ".", "7", ".", ".", ".", "."], ["6", ".", ".", "1", "9", "5", ".", ".", "."],
+         [".", "9", "8", ".", ".", ".", ".", "6", "."], ["8", ".", ".", ".", "6", ".", ".", ".", "3"],
+         ["4", ".", ".", "8", ".", "3", ".", ".", "1"], ["7", ".", ".", ".", "2", ".", ".", ".", "6"],
+         [".", "6", ".", ".", ".", ".", "2", "8", "."], [".", ".", ".", "4", "1", "9", ".", ".", "5"],
+         [".", ".", ".", ".", "8", ".", ".", "7", "9"]]
+print(S.solveSudoku(board))
+# TC: O(9^(nm)) Explanation: For first coord we've 9 options, and something got selected say 7. With this now for 2nd coord on basis of this arrangement we found 8 but then for 3rd coord we couldnt find anything and the rest of the 9 options for 2nd coord had to then be redone and if still still 3 doesnt find a value, we'll have to backtrack and test rest of 9 values of 1st coord. Thus 9 values for 1st coord is where each time 2nd coord's 9 values had to be checked and thus going forward with rest of the coords too. So this is like 9(9(9....)) hence 9^nm. Additionally, each time in 9^nm we're also calling validate function which runs 2 for loop which runs for 9 times. Thus total TC = (9^2)(9^nm) => 9^(nm+2). Generalized as 9^nm.
 # SC: O(mn) Explanation: Max length of recursive chain will be where at each col of every row, a new recursive call sets in. Which will go on and have a length of m*n recursive calls.

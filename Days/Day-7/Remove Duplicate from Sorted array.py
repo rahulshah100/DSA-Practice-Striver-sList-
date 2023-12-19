@@ -38,8 +38,8 @@ class Solution:
         newS=list(S) #Conversion from set to list takes n time in python.
         newS.sort()  #takes nlogn time
         for i in range(len(newS)):#n time
-            nums[i]=newS[i]
-        return len(newS)
+            nums[i]=newS[i]     #See this is still in bounds of in-place as directly at index changes are happening
+        return len(newS)        #but if we made nums=[] before this for-loop and then we did nums.append[], that violates the in-place and the answer did not match
 # TC: O(3n+nlogn) Explanation: as comment in the code explains
 # SC: O(n) Explanation: for storing n items in hashSet
 
@@ -47,14 +47,11 @@ class Solution:
 # Approach2: Using 2 pointers. We'll use i to band-together all the unique elems before it, and j to keep comparing elems further in the list. Starting from index 1 if item at j is same as the one at j-1th index, we'll simply keep incrementing j uptill that's not true. When jth item differs than j-1's, we'll store the jth item at ith index too and increment both i and j. In this way all elems before index i are unique ones.
 class Solution:
     def removeDuplicates(self, nums: List[int]) -> int:
-        i = j = 1
-        while j < len(nums):  #When list length is only one items, we'll not get in here only and so Overflow error is avoided
-            if nums[j] == nums[j - 1]:
-                j += 1
-            else:
-                nums[i] = nums[j]
+        i = 0
+        for k in range(1, len(nums)):
+            if nums[k] != nums[k - 1]:
+                nums[i + 1] = nums[k]
                 i += 1
-                j += 1
-        return i
+        return i + 1
 # TC: O(n)
 # SC: O(1)

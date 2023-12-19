@@ -10,10 +10,18 @@
 
 # Example:- Input: matrix = [[1,1,1],[1,0,1],[1,1,1]] Output: [[1,0,1],[0,0,0],[1,0,1]]
 #           Input: matrix = [[0,1,2,0],[3,4,5,2],[1,3,1,5]] Output: [[0,0,0,0],[0,4,5,0],[0,3,1,0]]
-# -------------------------------------------------------------------------------
-
-
-# Approach 1: My Original Approach- Using an array of array to store the indexes of row,col where 0s are found. Using that array in an another iteration to mark 0s in matrix.
+# ----------------------------------------------------------------------------------------------
+# Python Basics
+#         a = {1, 1, 2} #Set is unordered collections of unique elements. It is unordered because it's been randomized in the way hashing is easier. Hence it's elem look up time is O(1) like dictionary's and unlike array's. But because set is randomized even though it is mutable, you cant per say reassign the elems. We can add, lookup and remove the items tho. If we print this set we'll see it to have 1 only once. Also coz of randomized order set[i] gives error, but `for i in set: print i` does get job done
+#         b = {1: 2, 2: 's'} #Dictionary - accessible values by keys
+#         c = (1, 21, 1, 1) #Tuples - Immutable
+#         d = [12, 'as'] #List/Arrays
+#         e = set() #Another way to define a set, if it's empty
+#         print(type(a), a, type(b), b, type(c), c, type(d), d, type(e), e)
+#
+#         '&' is a bitwise AND-Operator in python wherease 'and' is a conditional AND
+# ------------------------------------------------------------------------------------------------
+# Approach 1: My Original Approach- Using an array of arrays to store the indexes of row,col where 0s are found. Using that array in an another iteration to mark 0s in matrix.
 #Note we wont have to take care of end case where matrix is a 1D, given the constraints
 from typing import List  # So we can use descriptions such as List[List[int]]) -> None.
 
@@ -48,7 +56,7 @@ S = Solution()
 # S.setZeroes([[1, 1, 1], [1, 0, 1], [1, 1, 1]])
 S.setZeroes([[0,1,2,0],[3,4,5,2],[1,3,1,5]])
 """
-# Time Complexity: O((rows*columns)+(rows*column(columns + rows)) i.e.(O(m*n)+((m*n)*(m+n)). Explaination: Due to 2 for loops being there for Filling LocateZeroes we have O(m*n). It is added with O((m*n)*(m+n)) more time consumed during making items as Zero. Break down of O(m*n(m+n)): RowColumnCordinate would have total m*n items in worst case (see below explained space complexity) and for each item amongst those many two inner for loops would execute one after other for all the columns in that row where 0 is found i.e.m times and for all rows in that column where 0 is found i.e. n times; hence together it is (m*n)*(m+n). This Time Complexity could be generalized as O(m*n).
+# Time Complexity: O((rows*columns)+(rows*column(columns + rows)) i.e.O(mn+ mn(m+n)). Explaination: Due to 2 for loops being there for Filling LocateZeroes we have O(m*n). It is added with O(mn(m+n)) more time consumed during making items as Zero. Break down of O(mn(m+n)): RowColumnCordinate would have total mn items in worst case (see below explained space complexity) and for each item amongst those many two inner for loops would execute one after other for all the columns in that row where 0 is found i.e. m times and for all rows in that column where 0 is found i.e. n times; hence together it is (m*n)*(m+n). This Time Complexity could be generalized as O(m*n).
 # Space Complexity: O(2(m*n)). Explaination: If all matrix items are 0, then m*n entries items would be stored in LocateZeroes. Each LocateZero Item has 2 items further. So, in worst case, total space consumed by that variable would be O(2(m*n)). This Space Complexity could be generalized as O(m*n).
 
 
@@ -74,12 +82,35 @@ class Solution(object):
                 if i in rows or j in cols:  #This will have O(m+n) time complexity given in rows we try finding the i first and it is not there and then in cols the we try finding j and it is the last item.
                     matrix[i][j] = 0  
 """
-# Time Complexity: O((m*n)+((m*n)*(m+n))) where M and N are the number of rows and columns respectively. Explaintation:O(m*n) for traversing the matrix to fill rows and cols variable. Another O(m*n) time to traverse through all elem of the Matrix and in that using m+n complexity to verify for each elem if it's corresponding row, col value is there in the rows or cols matrix. In total that is O((m*n)+((m*n)*(m+n))).
-# Space Complexity: O(M+N). Explaination: In worst case where all the items are zero then we'll have n row items in rows variable and m column items in cols variable. Together it'll make up m+n space used.
+# Time Complexity: O(mn + mn(m+n)) where M and N are the number of rows and columns respectively. Explaintation:O(m*n) for traversing the matrix to fill rows and cols variable. Another O(m*n) time to traverse through all elem of the Matrix and in that using m+n complexity to verify for each elem if it's corresponding row, col value is there in the rows or cols matrix. In total that is O((m*n)+((m*n)*(m+n))).
+# Space Complexity: O(M+N). Explaination: In worst case where all the items are zero then we'll have n row items in rows variable and m column items in cols variable. Together it'll take up m+n space used.
 
 
-# Approach3: Better Space complexity than the Approach 2.
-# Constant Space Approach: Traverse the matrix from top left corner i.e. 0,0th row and column respectively to their indexes being 0,1... 0,2... 2,1..2,2, till the end and as a 0 value is found anywhere, check in that entire row i.e. for all the columns in that row and if theyre not 0 then change them to a string "Zero". Similary, check for all the rows for the same column and if a non-zero value is found then replace that with "Zero". We dont change the already found 0 as it might affect other items and could make them 0 so those initially found 0 items have to be preserved. After one such complete traversal, do an another traversal just to change "Zero" to 0.
+# Approach3: Improved SC than Approach2
+# In Approach 2 instead of later iterating through whole matrix checking for each index if that row is in the set of markedRows or if so it the col Coord, we'll do seperate iterations directly over set of markedRows and then markedCols, each in which we traverse cols and rows for respective markedRows, markedCol set Coord.
+"""class Solution:
+    def setZeroes(self, matrix: List[List[int]]) -> None:
+        rows, cols = len(matrix), len(matrix[0])
+        rowCoords, colCoords = set(), set()
+        for i in range(rows):
+            for j in range(cols):
+                if matrix[i][j]==0:
+                    rowCoords.add(i)
+                    colCoords.add(j)
+        for i in rowCoords:
+            for j in range(cols):
+                matrix[i][j]=0
+        for i in colCoords:
+            for j in range(rows):
+                matrix[j][i]=0
+        return matrix
+"""
+# TC: O(mn + mn + mn) Explanation: Generalized as mn time we have 3 mn Time Complexities that are summed up, resulting due to traversing first to build set for row, col, then another for say traversing all n cols for m rows that are part of rows Set creating a mn TC requirement and similarly mn more TC for traversing colCoords
+# SC: O(m+n)
+
+
+# Approach4: Better Space complexity than the Approach 3.
+# Constant Space Approach: Traverse the matrix and as a 0 value is found anywhere, check in that entire row i.e. for all the columns in that row and if theyre not 0 then change them to a string "Zero". Similary, check for all the rows for the same column and if a non-zero value is found then replace that with "Zero". We dont change the already found 0 as it might affect other items and could make them 0 so those initially found 0 items have to be preserved. After one such complete traversal, do an another traversal just to change "Zero" to 0.
 """
 class Solution:
     def setZeroes(self, matrix: List[List[int]]) -> None:
@@ -100,11 +131,11 @@ class Solution:
                     matrix[i][j]=0
         print(matrix)
 """
-# Time Complexity: O(((m*n)*(m+n))+(m*n)). Explaination: Total traversal iteration for identifying and placing "Zero" would be O(m*n). If all the items are 0 in the matrix, then for each iteration of O(m*n), we'll have to go to m rows and make the particular column entry 0; similary we'll have to go to n columns in the row where 0 is found, so to check the items and make them "Zero"; this in total were m+n more traversal for each 0 found in the matrix. Hence the worst time entity in the given approach is 0((m*n)*(m+n)). In addition, we'll do one one more traversal in matrix to change "Zero" to 0, which will take 0(m*n).As O((m*n)*(m+n)) supercedes the time taken by 0(m*n) and given these are very large values, we can generalize our above given answer by only writing O((m*n)*(m+n)).
+# Time Complexity: O(mn(m+n)+ mn). Explaination: Total traversal iteration for identifying and placing "Zero" would be O(m*n). If all the items are 0 in the matrix, then for each iteration of O(m*n), we'll have to go to m rows and make the particular column entry 0; similary we'll have to go to n columns in the row where 0 is found, so to check the items and make them "Zero"; this in total were m+n more traversal for each 0 found in the matrix. Hence the worst time entity in the given approach is 0((m*n)*(m+n)). In addition, we'll do one one more traversal in matrix to change "Zero" to 0, which will take 0(m*n).As O((m*n)*(m+n)) supercedes the time taken by 0(m*n) and given these are very large values, we can generalize our above given answer by only writing O((m*n)*(m+n)).
 # Space Complexity: O(1). Explaination: No extra space is used as changes are implemented in the given matrix itself.
 
 
-# Approach4: Best Approach - Use First Row and Col to indicate whether that whole row and col respectively have to be made 0.
+# Approach5: Best Approach - Use First Row and Col to indicate whether that whole row and col respectively have to be made 0.
 # Modification: Two iterations. In first iteration we go through all matrix elems if they are 0 we check if they're in firstCol or firstRow in case of which we maintain two seperate variables indicating if first row or first col has to be made 0. If any other elems are found, the corresponding col and rows first elems are made 0. In second iteration we iterate through all matrix elems again, this time skipping all first row and first col items. We check whether the corresponding row or col has 0, which if so we make this elem as 0. Last if variables indicating row or column is 0 is true we change all elems in the first row or first col respectively to 0.
 class Solution():
     def setZeroes(self, matrix):
@@ -144,5 +175,5 @@ S = Solution()
 # S.setZeroes([[1, 0, 3]])
 # S.setZeroes([1, 0])
 
-# Time Complexity: O(2(m*n))
+# Time Complexity: O(2mn + m + n) Explanation: Two matrix iteration and in case FirstRowZero is True we'll take n time making all those columns Zero, if FirstColZero is True we'll take m time similarly.
 # Space Complexity: O(1)

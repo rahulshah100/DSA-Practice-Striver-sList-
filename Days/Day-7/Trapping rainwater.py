@@ -22,7 +22,7 @@ from typing import List
 # class Solution:
 #     def trap(self, height: List[int]) -> int:
 #         sum = 0
-#         for i in range(1, len(height)):
+#         for i in range(len(height)):
 #             l, u, maxL, maxU = i - 1, i + 1, 0, 0
 #             while l >= 0:
 #                 maxL = max(height[l], maxL)
@@ -38,48 +38,54 @@ from typing import List
 # TC:O(n^2) Explanation: Inside the for loop, together both inner while loop takes almost n iterations. So here we have an n inside n Time complexity.
 # SC:O(1)
 
+
 # Approach2: In approach 1, we'll reduce the T.C. at cost of space complexity, by calculating a prefixLeftMax and suffixRightMax. As prefixLeftMax, we'll calculate just for once, an array of n items from left to right, at each index showing the leftMax till that point. For suffixRightMax we'll start from right to left of given array here and put them at those indexes in suffixRightMax. Now in for loop, we can just refer to these arrays.
 class Solution:
     def trap(self, height: List[int]) -> int:
-        prefix, suffix = {0: 0}, {len(height) - 1: 0}
-        maxBar = 0
-        for i in range(0, len(height)):
-            prefix[i] = maxBar
-            maxBar = max(maxBar, height[i])
+        prefix = {}
+        maxHeight = 0
+        for i in range(len(height)):
+            prefix[i] = maxHeight
+            maxHeight = max(maxHeight, height[i])
 
-        maxBar = 0
+        suffix = {}
+        maxHeight = 0
         for i in range(len(height) - 1, -1, -1):
-            suffix[i] = maxBar
-            maxBar = max(maxBar, height[i])
+            suffix[i] = maxHeight
+            maxHeight = max(maxHeight, height[i])
 
-        sum = 0
-        for i in range(1, len(height) - 1):
-            sum += max(min(prefix[i], suffix[i]) - height[i], 0)
-        return sum
+        totWater = 0
+        for i in range(len(height)):
+            totWater += max(min(prefix[i], suffix[i]) - height[i], 0)
+
+        return totWater
 # S=Solution()
 # S.trap([4, 2, 0, 3, 2, 5])
 # S.trap([0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1])
 # TC: O(3n) Explanation: n space for for-loop + n space for computing prefixLeftMax + n for prefixRightMax.
 # SC: O(2n) Explanation: n extra space for both prefixLeftMax and prefixRightMax.
 
-# Approach3: Removing extra space from Approach-2 as well as using just one iteration throughout the array. So of essence is at each point to know how long is wall on either of the side, whichever is minimum. So we'll start iteration with 2 pointers l and r which will originally be set to point at 1st and last elem of given array. As we iterate from left and right we'll keep a track of maxLeft, for which we'll make a maxLeft and maxRight; originally both of which will be 0. First off at every iteration we'll check that value pointed by left pointer is smaller than the one pointed by right. In which case we know deciding factor is left pointer and using difference of wall's current height from left pointer we'll get amount of water to be stored at that index. But when current item i.e. left is smaller than right, it still could be the biggest left uptill that point in which case no water could be held above it, so we'll just update maxLeft as this item. In both of the scenario under left's height being smaller than right i.e. whether current left is maxLeft or not, at the end we increment left as that is our current pointer. Now if left point's to a value higher than right then we know right is deciding factor and so we check if current right is equal to or greater than maxRight so far, then we'll update maxRight to this value. If it's not maxRight we'll add to total water the difference between maxRight and height of item at index r. Under the scenario where right is smaller than left, at end we'll decrement right pointer by 1.
+
+# Approach3: Removing extra space from Approach-2 as well as using just one iteration throughout the array. So the intuition is that for a block of importance is its leftMaxWall or rightMaxWall, whichever one is shorter coz between two of them i.e. leftMaxWall and rightMaxWall, that much is only what could be stored. With that in mind we'll traverse the given array with 4 pointers l,r which are current left and right indexes, assigned at the start as 0 and len(arr)-1; and leftMax,rightMax which are uptill l the highest block height and in reverse order after r the highest wall found, both assigned to 0 at start. Mainly we'll only increment l uptill l is less than or equal to r. As we start our arrangement of code has been made such that we check if arr[l]<=arr[r] and if so we'll stay ensured the left wall is determining how much water could be stored for this block. This is where 2 cases arise: 1) If further arr[l]<leftMax then leftMax bounds the amount of water we can store at this block which is equal to leftmax-arr[l]  2) If not then arr is either equal to leftMax or greater than leftMax, so this is where current block becomes leftMax and hence no water could be stored on top. In both these case we increment l. This was all if arr[l]<=arr[r] and if this condition was not true it means the right wall is determining factor to how much water could be stored at this block. Under this scenario we are posed with further 2 cases 1) arr[r]<rightMax which if the case rightMax is binding parameter, and we add rightMax-arr[r] to the totalWater stored. 2) If arr is equal to right rightMax or greater than arr[r] is the rightMax and so no water will be stored on top here, hence we just reassign rightMax to arr[r]. Under both these scenarios we decrement r.
 class Solution:
     def trap(self, height: List[int]) -> int:
-        l,r,maxLeft,maxRight,total=0,len(height)-1,0,0,0
-        while l<=r: #As we would also want to calculate water stored at the index where l and r are equal, so we put l<=r as opposed to l<r.
-            if height[l]<height[r]:
-                if height[l]>=maxLeft:
-                    maxLeft=height[l]
+        leftmax = rightmax = totWater = 0
+        l, r = 0, len(height) - 1
+        while l <= r:  # As we would also want to calculate water stored at the index where l and r are equal, so we put l<=r as opposed to l<r.
+            if height[l] <= height[r]:
+                if height[l] < leftmax:
+                    totWater += leftmax - height[l]
                 else:
-                    total+=maxLeft-height[l]
-                l+=1
+                    leftmax = height[l]
+                l += 1
             else:
-                if height[r]>=maxRight:
-                    maxRight=height[r]
+                if height[r] < rightmax:
+                    totWater += rightmax - height[r]
                 else:
-                    total+=maxRight-height[r]
-                r-=1
-        return total
+                    rightmax = height[r]
+                r -= 1
+        return totWater
+
 S=Solution()
 S.trap([4, 2, 0, 3, 2, 5])
 S.trap([0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1])

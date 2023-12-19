@@ -54,7 +54,7 @@ class Solution:
         while fast and fast.next: #--1
             fast=fast.next.next
             slow=slow.next
-            if fast==slow: #having all of this under same while block helps validating the base condition #--1 through out the algo, to exit while and return None if at any point fast or fast.next becomes None. Or if these were seperate block then as shown in #--2 we'll have to explicitly handle this
+            if fast==slow:
                 fast=head
                 while fast!=slow:
                     fast=fast.next
@@ -75,7 +75,7 @@ class Solution:
             slow = slow.next
             if fast == slow:
                 break
-        if not fast or not fast.next: #--2 #At this point we dont know how we got out of above while block 1). if fast became == slow and thus break was triggered or 2).fast/fast.next became null and while block got terminated, in which case coz we reached None we know given LL does not have a Cycle and would want to return None. Hence to check if it is 2) we use this if block here.
+        if not fast or not fast.next:  #At this point we dont know how we got out of above while block 1). if fast became == slow and thus break was triggered or 2).fast/fast.next became null and while block got terminated, in which case coz we reached None we know given LL does not have a Cycle and would want to return None. Hence to check if it is 2) we use this if block here.
             return None
 
         slow = head

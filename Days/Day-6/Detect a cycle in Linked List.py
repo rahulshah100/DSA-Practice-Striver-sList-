@@ -49,7 +49,7 @@ class Solution:
 class Solution:
     def hasCycle(self, head: Optional[ListNode]) -> bool:
         fast = slow = head
-        while fast and fast.next: #Ensuring fast and fast.next to not be None suffices as we know fast.next is pointing to something it could be None, but even in that case at #--1 we'll not get error of `trying to acces next of None`
+        while fast and fast.next: #Ensuring fast and fast.next is not be None is necessary. As fast.next is known here to be something, then after that something even if there is None then it is fine as at #--1 fast.next.next will be None and not that fast.next will be none coz then it'sll be None.next. Further in next iteration we have to ensure we stop which is why we put fast too here.
             fast = fast.next.next #--1
             slow = slow.next
             if slow == fast:

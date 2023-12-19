@@ -30,22 +30,18 @@ arr = [7, 1, 5, 3, 6, 4]
 # arr = [7, 6, 4, 3, 1]
 # arr = [3, 2, 1]
 print(S.maxProfit(arr))"""
-# TimeComplexity:O(n^2). Explanation: for the first iteration of outer loop, the inner loop will run for n-1 times then for second iteration of outer loop, the inner one will run for n-2... upto lastly it will run for 1 time. We recongnize this as binomial sum and that total iterations here will be n(n+1)/2 which could be generalized as n^2.
+# TimeComplexity:O(n^2). Explanation: for the first iteration of outer loop, the inner loop will run for n-1 times then for second iteration of outer loop, the inner one will run for n-2... upto lastly it will run for 1 time. We recognize this as binomial sum and that total iterations here will be n(n+1)/2 which could be generalized as n^2.
 # SpaceComplexity: O(1). Just a variable with constant space is required extra by the program hence it's space complexity is O(1).
 
 
-# Approach2: Improved time complexity. Similar to kedane's algo we're here using a 3 pointer method. Idea here is potential of changing buying date only comes if we find a new less buying, which if so, then from there on we look for the upcoming highest selling price. First pointer i goes through array in one iteration. On every next index it goes, starting from 1 (not 0 because that's with what we have initiated our buylow i.e.bl and sellhigh i.e.sh variables) if we find a val smaller than prev. bl, we update the bl. Now since bl has been updated we can only sell in future and hence if sh had a value of any prev index we update it to bl, so from here on buying-then-selling difference could be counted. On i's visit to next index if we find a val. greater than prev. sh's we update sh and that's when we need to count newly made profit which if greater than maxProf we update newProf to be our maxProf
+# Approach2: Improved time complexity. Kedane's algo - at each point we decide if it could be a buying point if it's lesser than prev buying point's price. If not we consider it to be a selling point and find the difference between this point's price with prev buying point's price. If difference is greater than maxProfit so far, this will be the new maxProfit.
 class Solution:
     def maxProfit(self, prices: List[int]) -> int:
-        bl = sh = profMax = 0
+        maxProfit, smallestItem = 0, 0
         for i in range(1, len(prices)):
-            if prices[i] < prices[bl]:
-                bl = sh = i
-            elif prices[i] > prices[sh]:
-                sh = i
-                if prices[sh] - prices[bl] > profMax:
-                    profMax = prices[sh] - prices[bl]
-        return profMax
+            maxProfit = max(maxProfit, prices[i] - prices[smallestItem])
+            if prices[i] < prices[smallestItem]: smallestItem = i
+        return maxProfit
 
 
 S = Solution()

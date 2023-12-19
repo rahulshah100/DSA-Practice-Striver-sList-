@@ -23,45 +23,43 @@
 # -10^9 <= target <= 10^9
 # Only one valid answer exists.
 # ----------------------------------------------------------------------------------------------------------------------------------------------------
-# Approach1: Two for loops, first pointing to all elems one by one and second one within the first for loop will check for all the remaining elem if there os an elem with value target-nums[i[. If found return it, or else i will go to next iteration.
+# Approach1: Two for loops, first pointing to all elems one by one and second one within the first for loop will check for all the remaining elem if combined with item pointed by first loop, they sum up-to target. If found return it, or else to next iteration.
 # Time Complexity: O(n^2) given that nums is represented as n.
 # Space Complexity: O(1)
 
 
-# Approach2: Sorting the given array and using Binary Search to find target elems. Later locating those elems in unsorted/original array and returning those indices
+# Approach2: Sorting the given array and in the sorted array using a similar to Binary Search technique to find target elem. So we start with pointing 1st and last item of array using first and last pointer in the sorted array. If these pointer's sum to target, we've found the items. If sum is less we make fist pointer point to array's next item. If sum is more we change our last pointer to a previous item. Thus having found items would return coordinates for sorted array. We further run a loop in original array and locate these 2 items and return these coordinates.
 from typing import List
-import copy
 
 class Solution:
     def twoSum(self, nums: List[int], target: int) -> List[int]:
-        nums1 = copy.deepcopy(nums)
-        nums1.sort()
-        val1 = val2 = None
-        l, u = 0, len(nums) - 1
-        while l < u: #Retrieving elems that sum upto target
-            if nums1[l] + nums1[u] == target:
-                val1, val2 = nums1[l], nums1[u]
+        tempNums = nums[:]  #As nums dont have any subitems that are derived data types like arrays or tuples we can use shallow copy
+        tempNums.sort()     #Remember lists are mutable so we dont have to do assignment i.e. tempNums=tempNums.sort()
+        i, j = 0, len(nums) - 1 #In fact sort() has None as it's return type, so tempNums=tempNums.sort() will infact backfire & hence we just use tempNums.sort()
+        while i < j:
+            if tempNums[i] + tempNums[j] == target:
                 break
-            elif nums1[l] + nums1[u] < target:
-                l += 1
-            elif nums1[l] + nums1[u] > target:
-                u -= 1
-        val1NotFound = True
-        for i in range(len(nums)): #Retrieving the indices of elems that sum upto target
-            if nums[i] == val1 and val1NotFound:
-                val1 = i
-                val1NotFound = False
-            elif nums[i] == val2:
-                val2 = i
-        return [val1, val2]
+            elif tempNums[i] + tempNums[j] < target:
+                i += 1
+            else:
+                j -= 1
+
+        firstCoord = secondCoord = None
+        for x in range(len(nums)):
+            if tempNums[i] == nums[x] and firstCoord is None: #firstCoord is None is imp condition or say in [3,3] target = 6 our firstCoord will be assigned to initally 0th and in later iteration to 1st index whereas secondCoord will stay None
+                firstCoord = x
+            elif tempNums[j] == nums[x]:
+                secondCoord = x
+
+        return firstCoord, secondCoord
 
 S = Solution()
-print(S.twoSum([-18, 12, 3, 0], -6))
-# TC: O(nlogn+2n) Explanation: nlogn to sort and n times for finding elems, plus n time to find the indices of those elem.
+print(S.twoSum([3, 2, 4], 6))
+# TC: O(nlogn+2n) Explanation: nlogn to sort and n times for finding elems in the sorted array plus n more time to locate the found elems in original array
 # SC: O(n) Explanation: to store nums1
 
 
-# Approach3: Better Time. As there are two elems that'll sum upto target, hence if we traverse the array storing the items and their indexes in a hashmap, and alongside if we keep checking at each traversal if target-nums[i] could be found in the hashmap, then when 2nd number of pair will be encounterd, at that time it's counter part i.e.target-nums[i] would certainly be found in the hashmap. We can return both of these indexes.
+# Approach3: Better Time. In approach 1 reducing a for-loop by using hashDict. One for loop will continuously loop through array, starting which hashDict will be empty. We'll check if target-currentItemPointedByFor is in hashDict if not we store this item and move to next iteration thus up-till last iteration all values are stored in hashMap, and we refer to it at any given iteration alongside item pointed by for-loop to see if it collectively we can find a count equal to target.
 from typing import List
 
 class Solution:
@@ -72,8 +70,8 @@ class Solution:
                 return (hashtable[target-nums[i]], i)
             else:
                 hashtable[nums[i]]=i
-        print(hashtable)
+
 S=Solution()
 print(S.twoSum([2,7,11,15], 13))
-# Time Complexity: O(n). Explaination: n time for all iterations in for loop. Also the dictionary.get() takes only O(1) so in total only O(n) time complexity would occur
+# Time Complexity: O(n). Explanation: n time for all iterations in for loop. Also, the dictionary.get() takes only O(1) unless we've complicated keys like arrays which isn't the case here. So in total only O(n) time complexity would occur
 # Space Complexity: O(n). For storing n items in hashtable.

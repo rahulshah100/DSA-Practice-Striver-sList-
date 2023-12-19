@@ -44,7 +44,7 @@ class Solution:
         temp1=temp2=head
         dict={}
         while temp1:
-            dict[temp1]=Node(temp1.val)
+            dict[temp1]=Node(temp1.val) #because Nodes are stored as keys so even if linked list has nodes with repeating values, as not values but Nodes are keys, we'll still have all nodes as unique keys here
             temp1=temp1.next
 
         dict[None]=None #For below line --1. As we're told random ponters could point to None in which case dict[None] would have to be available
@@ -54,9 +54,10 @@ class Solution:
             temp2=temp2.next
         return dict[head]
 # TC: O(2n) Explanation: n for forming hashmap and n for connecting the node's random and next pointers in the hashmap. Note: here we're assuming the lookup time in hashmap dictionary for nodes as the key is O(1) or that time would be added.
-# SC: O(n) Explanation: n space used in hashmap for storing n nodes
+# SC: O(n) Explanation: n space used in building hashmap, for which values are n newly created nodes. Thus total 2n space. But as deep copy is given in question n space i.e. for creating new nodes is expected, we mention SC to be O(n) only involving hashmap space
 
-# Approach2: To eliminate extra n space, we'll not use hashmap. This means we will have to accomodate creating and storing the newly created nodes directly in our given linked list. First off we'll traverse the given LL, creating newNodes with values of the ones being traversed and store them between two Nodes of given LL. So the traversed node's next will point to the newNode and newNode's next will point to originally where the traversed's next pointed. This will essentially weave new nodes alternately between the nodes of given LL. Further we'll traverse the updated LL to set the random pointers amongst the newNodes. So traversed node's random will have it's next pointing to the it's newly created replica node. This is where traversed's next will be made to point. At the end we have to de-tangle nexts of newNodes. And thus we'll get a seperate LL of newNodes having correct next and random pointers.
+
+# Approach2: To eliminate extra n space, we'll not use a hashmap. But if we create new nodes seperately then as we have them created although we can keep connecting them with newer nodes and thus have their next pointer's sorted, but we'll possibly not be able to connect their random. This gives idea to accommodate the newly created nodes directly in our given linked list in between the existing nodes so to have some failiar structure that can be leveraged to connect random pointers of new nodes. First off we'll traverse the given LL, creating newNodes with values of the ones being traversed and store them between two Nodes of given LL. This will essentially weave new nodes alternately between the nodes of given LL. Further we'll traverse the updated LL to set the random pointers amongst the newNodes. For this part, traversed node's random will have it's next pointing to it's newly created replica node. At the end we have to de-tangle nexts of newNodes. Important part is detangling and removing next pointers should not be simultaneous or else say a next is removed now when current node's random's next is checked the new node has been disconnected, and we'll run into inconsistencies.
 """
 # Definition for a Node.
 class Node:

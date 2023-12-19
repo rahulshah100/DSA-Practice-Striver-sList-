@@ -1,3 +1,5 @@
+# https://www.interviewbit.com/problems/matrix-median/
+
 # Problem Description
 # Given a matrix of integers A of size N x M in which each row is sorted. Find and return the overall median of matrix A.
 # NOTE: No extra memory is allowed.
@@ -23,64 +25,101 @@
 # Output: 17
 # Explanation: Median is 17.
 # ------------------------------------------------------------------------------------------------------------------------------------
-# Approach1: Median meaning finding the center most number in range of number which are sorted.
+# Note: Median meaning finding the number before and after which we'll have equal items present
+
+# Approach1: Make a 1D array from the given N*M dimensional array, and sort it to later return the middle item.
 class Solution:
     def findMedian(self, A):
-        OneDArr=[]
+        OneDArr = []
         for i in range(len(A)):
             for j in range(len(A[0])):
                 OneDArr.append(A[i][j])
         OneDArr.sort()
-        mid=len(OneDArr)//2
-        return OneDArr[mid] #N*M is odd as mentioned in constraint, spares us from otherwise having to think what to show as median for say Arr=[1,3,7,9]
+        mid = len(OneDArr) // 2
+        return OneDArr[
+            mid]  # N*M is odd as mentioned in constraint, spares us from otherwise having to think what to show as median for say Arr=[1,3,7,9]
+
 
 S = Solution()
 print(S.findMedian([[1, 3, 5],
                     [2, 6, 9],
                     [3, 6, 9]]))
+
+
 # TC: O(MN + MNlogMN) Explanation: Iterating through N numbers for M Times yields MN. Plus sorting the array takes MNlogMN
 # SC: O(MN) Explanation: OneDArr stores MN items
 
 
-# Approach2: In an n*m array i.e. [[1, 3, 7],[2, 7, 9],[3, 7, 9]] median could only be a number which has more than (n*m)//2 count of items from the given Array which are less than or equal to the current number. For eg: from 2D array consider 2 to be median. As there are only (n*m)//2=> 9//2=> 4 and 2 has only 2 instances where it items are equal or lesser than it, 2 cant be median. Similarly, 3 has 4 number satisfying this condition which as is not greater than (n*m)//2 i.e.4, 3 also cant be median. With this condition 7,8,9 could all be medians, as in the given array the number of items less than or equal to them are greater than (n*m)//2. Intuition is to find the first number, if we were checking in a sorted given array, which will satisfy the median condition and is present in the given Array too which for the given example will be 7. For achieving this we can find highest and lowest number from given array and for all the numbers in between including highest and lowest, check count of items satisfying median condition. The first number where condition is met we'll start checking if this number is present in givenArray. Given that 1<= A[i] <=10^9 for 10^9 which is constant we can run for loop wherein each time nm items would be traversed yielding nm TC. Or this is where we could kick in Binary Search to identify the exact spots where the condition is met. Finding mid-point of high and low which is highest and lowest number by default, we'll see if that number satisfies condition of median. If so we'll move the high to mid-1 to see if new mid will also satisfy median condition. If it does not we'll shift low to mid+1. At the point low becomes greater than high we return the number pointed by low. Guarantee for the returned low to have been existing in the given Array comes from the fact how in above example for 3 if median condition wasn't met, so won't it if mid was 4,5, and 6. As these number are not present and hence no difference would be created in count of items for them satisfying the median condition, their counts will stay same as count of last present number before them. In such case low would kept being increased then mid. Eventually high and low will catch up. And as they do, as high always ensures the items above it are the ones that meet median condition and low ensures items below it don't satisfy condition, we know from there the next item i.e.above high is first item to satisfy median condition and it is returned.
+# Approach2: Intuition: If we discover highest and lowest item in the given matrix then using binary search we can keep searching for numbers for which the count of items in array which are either equal or lesser than this number are m*n//2 items. Now it could happen that for [[1, 3, 7],[2, 7, 9],[3, 7, 9]] lowest=1, highest=9 and mid==5. While checking for 5 we discover 1,3,2,3 i.e. 4 numbers are there lesser or equal to 5 which are present in array which is equal to row*col//2 => 3*3//2 => 4 and hence it meets median condition yet still we could have 4 which is the case here which could also satisfy median condition. Thus even after meeting median condition we'll let binary search play out up-till l<=u condition violates. If you notice 5 or 4 which condition satisfies is not even in array but eventually as we let binary search continue, we'll come to 3 from 4 and after which l<=u will violate. Thus, always we'll converge at an item present before l<=u violates. To keep track of lastMedian we found we use an extra variable and return this once binary search is over.
 class Solution:
     def findMedian(self, A):
-        rows, cols = len(A), len(A[0])
-        l = u = A[0][0]
-        for i in range(rows):
-            for j in range(cols):
-                if l > A[i][j]: l = A[i][j]
-                if u < A[i][j]: u = A[i][j]
+        lowest = highest = A[0][0]
+        for i in range(len(A)):
+            for j in range(len(A[0])):
+                if A[i][j] < lowest: lowest = A[i][j]
+                if A[i][j] > highest: highest = A[i][j]
 
+        l, u = lowest, highest
+        lastMedian = None
         while l <= u:
-            mid = (l + u) // 2  # Binary search on range of all numbers from lowest to highest items in given Arr
-            if countInstances(A, mid, cols, rows) <= (rows * cols) // 2:
-                l = mid + 1
-            else:
+            mid = (l + u) // 2
+            count = 0
+            for i in range(len(A)):
+                for j in range(len(A[0])):
+                    if A[i][j] <= mid:
+                        count += 1
+            if count > (len(A) * len(A[0])) // 2:
+                lastMedian = mid
                 u = mid - 1
+            else:
+                l = mid + 1
+        return lastMedian
+
+
+A = [[1, 3, 5],
+     [2, 6, 9],
+     [3, 6, 13]]
+S = Solution()
+print(S.findMedian(A))
+# TC: O(nm + mnlog(maxItemInArr-minItemInArr)) where n is row and m is columns. Explanation: nm to traverse and find highest and lowest. Further, for this range between highest and lowest we'll do binary search which takes log(maxItemInArr-minItemInArr) time. In each binary search iteration we're traversing whole array i.e. mn to find count, so it becomes mnlog(maxItemInArr-minItemInArr) for every binary search iteration.
+# SC: O(1)
+
+
+# Approach3: Improvement to Approach 2. We'll do 2 optimization 1) Avoid using lastMedian and instead return l 2) Taking advantage of fact that each row is sorted, we'll not use 2 for loops but binary search on it. To expand on point 1 we notice that l is incremented in case mid is not found to meet the median condition and u is decremented in case median is found. Thus, we're always making sure onto left of l-pointer we have all and only those numbers which passes the median condition, and starting l-pointer we have numbers with corresponding counts greater than (m*n)//2. Similarly with u-pointer we decrement it whenever nums[u] is meeting median, thus making sure u and onto its left no items meet median condition. Thus, here we return nums[l] as first number to meet median condition, and it's the same as to writing nums[u+1]. To expand on 2, we'll use a loop to traverse us in rows and in each row we'll use binary search to find the sweet spot below which items are lesser or equal to current item, and we'll add this count for each row.
+class Solution:
+    def findMedian(self, A):
+        lowest = highest = A[0][0]
+        for i in range(len(A)):
+            for j in range(len(A[0])):
+                if A[i][j] < lowest: lowest = A[i][j]
+                if A[i][j] > highest: highest = A[i][j]
+
+        l, u = lowest, highest
+        while l <= u:
+            mid = (l + u) // 2
+            if self.count(mid, A) > (len(A) * len(A[0])) // 2:
+                u = mid - 1
+            else:
+                l = mid + 1
         return l
 
+    def count(self, num, A):
+        totCt = 0
+        for i in range(len(A)):
+            l, u = 0, len(A[0]) - 1
+            while l <= u:
+                mid = (l + u) // 2
+                if A[i][mid] > num:
+                    u = mid - 1
+                else:
+                    l = mid + 1
+            totCt += l  # Note: To discover why l is added, dry run a case or two Eg: where 14 is number lesser or equal to which we're looking for in [13, 15, 17, 19] we'll find l is always giving the answer. Alternatively, l is only how it works and not even mid+1. Coz for last time when mid is found and after which l increments and l<=u is violated; then mid+1 is fine as it is equal to l. But when mid is discovered & further u decrements to violate the condition, mid+1 will give wrong answer in that case as it'll be an index one more than l. Basically with l we're making sure to increment it in the case a smaller number is encountered and so it always ends up barring the smaller entries under it.
+        return totCt
 
-def countInstances(Arr, number, totcolS, totRows): #As rows are sorted, we'll use Bin search, where we'll identify spot from where numbers are higher than given number.
-    totCt=0
-    for i in range(totRows):
-        low, high = 0, totcolS - 1
-        while low <= high:
-            mid = (low + high) // 2
-            if Arr[i][mid] <= number:
-                low = mid+1
-            else:
-                high = mid-1
-        totCt += low
-    return totCt
-
-
+A = [[1, 3, 5],
+     [2, 6, 9],
+     [3, 6, 13]]
 S = Solution()
-print(S.findMedian([[1, 3, 5],
-                    [2, 6, 9],
-                    [3, 6, 9]]))
-print(S.findMedian([
-  [1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3]
-]))
-# TC: O(nlog(m)) given n rows and m columns Explanation: for range of numbers equivalent to difference between the highest and lowest variables, we'll call countInstances which will run binary search on subArr of length m for n times. Given constraints minimum could be an item 1 in given array and max could be 10^9. So that makes worst case TC for us as O(10^9 * nlogm) but as 10^9 is constant and Time Complexity is used to see how algorithm grows to take more time as array size increases, here that makes 10^9 irrelevant to be included. Hence TC=nlongm
+print(S.findMedian(A))
+# TC: O(nm + log(nm)log(maxItemInArr-minItemInArr)) Main difference than approach2 here is that instead of nm time in each BS iteration it'll be log(nm)
 # SC: O(1)

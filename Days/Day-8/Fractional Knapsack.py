@@ -29,7 +29,7 @@
 # 1 <= N <= 105
 # 1 <= W <= 105
 # ------------------------------------------------------------------------------------------------------------------------------------------------
-# Approach1:Sort the given arr in descending order of their val/weight ratio. Further we'll devise a val and weight variable to keep track of total val and weight updated at each iteration as we traverse through the sorted array. While traversing if current item's weight added into weight variable stays less or equal to permitted Max weight we'll add curr item's weight and val into weight and val variables respectively. If item's weight added to weight var exceeds the permitted weight then we'll include only fractional weight of that item as much as it doesnt exceed and value for only that much fraction will be added to val variable, before breaking the for loop. We'll return val variable.
+# Approach1:Sort the given arr in descending order of their val/weight ratio. Further, in a for loop we'll traverse over the given array each time checking if deducting the current weight from given weight gives 0 or a positive number. If so, we'll subtract from given weight, the weight of current item and add in totVal the val of this item. Conversely if subtraction results in a negative number we know the full item cant be accomodated and in totVal we'll only increment a unit's val * leftWeight i.e. arr[i].val/arr[i].weight * W, at this point we break the for-loop as given weight W is all exhausted and we return totVal.
 """
 class Item:
     def __init__(self,val,w):
@@ -39,17 +39,15 @@ class Item:
 
 class Solution:
     def fractionalknapsack(self, W, arr, n):
-        # Here arr is a list of Item objects.
         arr.sort(key=lambda x: x.value / x.weight, reverse=True)
-        weight = val = 0
-        for item in arr:
-            if weight + item.weight <= W:
-                weight += item.weight
-                val += item.value
+        totVal = 0
+        for i in range(len(arr)):
+            if W - arr[i].weight >= 0:
+                W -= arr[i].weight
+                totVal += arr[i].value
             else:
-                val += ((W - weight) / item.weight) * (item.value)
-                weight += ((W - weight) / item.weight)
+                totVal += (arr[i].value / arr[i].weight) * W
                 break
-        return val
+        return totVal
 # TC: O(nlogn+n) Explanation: nlogn n to sort the array. n for going through all weights while adding them in total weight and calculating total value we can offer.
 # SC: O(1)

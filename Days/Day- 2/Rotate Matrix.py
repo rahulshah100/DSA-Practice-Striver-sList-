@@ -13,19 +13,21 @@
 # -1000 <= matrix[i][j] <= 1000
 # ---------------------------------------------------------------------------------------------------------------------------------------------
 # Approach1: Create a transitionary/dummy matrix same as the given one. Arrange elements in wanted fashion in that one from the given one, and later make given one equal to dummy matrix
-"""
+from typing import List
+import copy
+
 class Solution:
     def rotate(self, matrix: List[List[int]]) -> None:
-        dumMatrix=copy.deepcopy(matrix) #NOTE the way I have copied. It's the copy by reference problem in python. So for all derived data structures this has needs to be done for copying two variables.
-        # dumMatrix=matrix[:] #NOTE this didnt work coz this is shallow copy where although new array is created, the inner items are refernced from same mem. location where the array from which it has copies has been
+        dumMatrix=copy.deepcopy(matrix) #NOTE the way I have copied. It's the copy by reference problem in python. So for all derived data structures this needs to be done for copying.
+        # dumMatrix=matrix[:] #NOTE this didn't work coz this is shallow copy where although new array is created, the inner items are referenced from same mem. location where the array from which it has copied has been
         for i in range(len(matrix)):
             for j in range(len(matrix)):
-                dumMatrix[j][len(matrix)-1-i]=matrix[i][j]
-        # matrix=copy.deepcopy(dumMatrix) #NOTE this didnt work, as in this problem we were asked to change in-place and not reassign or return anything. Hence leetcode has a certain way to tracks the variable and it either looses that track if the variable is reassigned or doesnt count that valid due to in-place specification.
+                dumMatrix[j][len(matrix)-1-i]=matrix[i][j] #This is where instead if we did matrix[j][len(matrix)-1-i]=dumMatrix[i][j] our solution ends!
+        # matrix=copy.deepcopy(dumMatrix) #NOTE this didn't work, as in this problem we were asked to change in-place and not reassign or return anything. Hence, leet-code has a certain way to track the variable and it either looses that track if the variable is reassigned or doesn't count that valid due to in-place specification.
         for i in range(len(matrix)):
             for j in range(len(matrix)):
                 matrix[i][j] = dumMatrix[i][j]
-"""
+
 # TC: O(3(n^2))
 # SC: O(n^2)
 
@@ -54,5 +56,5 @@ class Solution:
 S=Solution()
 S.rotate([[1,2,3],[4,5,6],[7,8,9]])
 S.rotate([[5,1,9,11],[2,4,8,10],[13,3,6,7],[15,14,12,16]])
-# Time Complexity: O(n^2), given that the matrix is shown as n. Explanation: for calculating the transponse of matrix, we are using two for loops in which for first iteration the inner for loop will run for n-1 times, then for second iteration of outer for loop, the inner for loop will run for n-2 times and so on upto 0 times at last. This is Binomial Sum of iterations, and total iterations here are O(N(N+1)/2). For reversing the rows the outer for loop will run for n times. Each time making inner for loop run for (n-1)/2 or n/2 times depending on whether the n is odd or even respectively. As (n-1)/2= n/2-1/2, by removing constant we get n/2 and hence for inner while loop, regardless of n being odd or even, we can consider it's time complexity as n/2. Therefore in case of reversing the rows total time complexity=n(n/2). Total=n(n/2)+(n(n+1)/2). This is generalized as O(n^2).
+# Time Complexity: O(n^2), given that the matrix is shown as n. Explanation: for calculating the transpose of matrix, we are using two for loops in which for first iteration the inner for loop will run for n-1 times, then for second iteration of outer for loop, the inner for loop will run for n-2 times and so on upto 0 times at last. This is Binomial Sum of iterations, and total iterations here are O(N(N+1)/2). For reversing the rows the outer for loop will run for n times. Each time making inner for loop run for (n-1)/2 or n/2 times depending on whether the n is odd or even respectively. As (n-1)/2= n/2-1/2, by removing constant we get n/2 and hence for inner while loop, regardless of n being odd or even, we can consider its time complexity as n/2. Therefor in case of reversing the rows total time complexity=n(n/2). Total=n(n/2)+(n(n+1)/2). This is generalized as O(n^2).
 # Space Complexity: O(1)
